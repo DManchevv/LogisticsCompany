@@ -1,0 +1,118 @@
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Справка за приходи</h5>
+    </div>
+    <div class="card-body">
+        <form id="revenueReportForm" method="GET" action="/reports/revenue" class="mb-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="startDate" class="form-label">Начална дата</label>
+                    <input type="date" class="form-control" id="startDate" name="start_date" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="endDate" class="form-label">Крайна дата</label>
+                    <input type="date" class="form-control" id="endDate" name="end_date" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="officeFilter" class="form-label">Филтър по офис</label>
+                    <select class="form-select" id="officeFilter" name="office_id">
+                        <option value="">Всички офиси</option>
+                        <% offices.forEach(office => { %>
+                            <option value="<%= office.id %>"><%= office.name %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Генерирай справка</button>
+                </div>
+            </div>
+        </form>
+
+        <% if (revenues && revenues.length > 0) { %>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Брой пратки</th>
+                            <th>Общо приходи</th>
+                            <th>Доставки до офис</th>
+                            <th>Доставки до адрес</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% revenues.forEach(rev => { %>
+                        <tr>
+                            <td><%= rev.date %></td>
+                            <td><%= rev.shipment_count %></td>
+                            <td><%= rev.total_revenue.toFixed(2) %> лв.</td>
+                            <td><%= rev.office_deliveries %> (<%= rev.office_revenue.toFixed(2) %> лв.)</td>
+                            <td><%= rev.address_deliveries %> (<%= rev.address_revenue.toFixed(2) %> лв.)</td>
+                        </tr>
+                        <% }); %>
+                        <tr class="table-success fw-bold">
+                            <td>Общо:</td>
+                            <td><%= totalShipments %></td>
+                            <td><%= totalRevenue.toFixed(2) %> лв.</td>
+                            <td><%= totalOfficeDeliveries %> (<%= totalOfficeRevenue.toFixed(2) %> лв.)</td>
+                            <td><%= totalAddressDeliveries %> (<%= totalAddressRevenue.toFixed(2) %> лв.)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-4">
+                <canvas id="revenueChart" height="100"></canvas>
+            </div>
+        <% } else if (requestSubmitted) { %>
+            <div class="alert alert-info">Няма данни за избрания период</div>
+        <% } %>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    <% if (revenues && revenues.length > 0) { %>
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [<%= revenues.map(r => `"${r.date}"`).join(',') %>],
+                datasets: [
+                    {
+                        label: 'Приходи от доставки до офис',
+                        data: [<%= revenues.map(r => r.office_revenue).join(',') %>],
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Приходи от доставки до адрес',
+                        data: [<%= revenues.map(r => r.address_revenue).join(',') %>],
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Приходи по дни'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Приходи (лв.)'
+                        }
+                    }
+                }
+            }
+        });
+    <% } %>
+</script>
