@@ -1,0 +1,36 @@
+<%- include('../layouts/admin-header') %>
+
+<div class="container mt-4">
+    <h1>Admin Dashboard</h1>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Users</h5>
+                    <p class="card-text">Manage all registered users</p>
+                    <a href="/admin/users" class="btn btn-light">Go to Users</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Content</h5>
+                    <p class="card-text">Manage site content</p>
+                    <a href="/admin/content" class="btn btn-light">Manage Content</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Settings</h5>
+                    <p class="card-text">Configure system settings</p>
+                    <a href="/admin/settings" class="btn btn-light">System Settings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../layouts/admin-footer') %>

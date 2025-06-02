@@ -4,9 +4,11 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
 const { Pool } = require('pg');
+const flash = require('express-flash');
 
 const app = express();
 const port = process.env.PORT || 3000;
+const path = require ('path');
 
 // Database connection
 const pool = new Pool({
@@ -27,6 +29,12 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
+app.set('view engine', 'html');
+
+app.use(express.static('./public/'));
+app.set('views', __dirname + '/views')
+app.engine('html', require('ejs').renderFile);
 
 // Passport configuration
 passport.use(new LocalStrategy(
@@ -70,7 +78,13 @@ const employeeRoutes = require('./routes/employees');
 const officeRoutes = require('./routes/offices');
 const shipmentRoutes = require('./routes/shipments');
 const reportRoutes = require('./routes/reports');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const adminRouter = require('./routes/admin');
 
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+app.use('/admin', adminRouter);
 app.use('/auth', authRoutes);
 app.use('/clients', clientRoutes);
 app.use('/employees', employeeRoutes);

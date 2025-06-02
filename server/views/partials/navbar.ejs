@@ -1,0 +1,27 @@
+<nav class="navbar">
+    <div class="container navbar-container">
+        <a href="/" class="navbar-brand">
+            <i class="fas fa-hands-helping"></i>
+            ProjectHelp
+        </a>
+        <ul class="navbar-menu">
+            <li class="navbar-item"><a href="/" class="navbar-link">Home</a></li>
+            <li class="navbar-item"><a href="/about" class="navbar-link">About</a></li>
+            <li class="navbar-item"><a href="/services" class="navbar-link">Services</a></li>
+            <% if (user) { %>
+                <li class="navbar-item">
+                    <a href="/dashboard" class="btn btn-primary">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+            <% } else { %>
+                <li class="navbar-item"><a href="/auth/login" class="navbar-link">Login</a></li>
+                <li class="navbar-item">
+                    <a href="/auth/register" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a>
+                </li>
+            <% } %>
+        </ul>
+    </div>
+</nav>
