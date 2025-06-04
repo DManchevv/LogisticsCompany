@@ -35,6 +35,10 @@ app.set('view engine', 'html');
 app.use(express.static('./public/'));
 app.set('views', __dirname + '/views')
 app.engine('html', require('ejs').renderFile);
+app.use((req, res, next) => {
+  res.locals.currentPage = req.path.split('/')[1] || 'home';
+  next();
+});
 
 // Passport configuration
 passport.use(new LocalStrategy(
