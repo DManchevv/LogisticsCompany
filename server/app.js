@@ -1,7 +1,5 @@
+require('dotenv').config({ path: '.env' });
 const express = require('express');
-const session = require('express-session');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
 const { Pool } = require('pg');
 const flash = require('express-flash');
@@ -9,6 +7,9 @@ const flash = require('express-flash');
 const app = express();
 const port = process.env.PORT || 3000;
 const path = require ('path');
+
+const session = require('express-session');
+const pgSession = require('connect-pg-simple')(session);
 
 // Database connection
 const pool = new Pool({
@@ -22,13 +23,27 @@ const pool = new Pool({
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 app.use(session({
-  secret: process.env.SESSION_SECRET || "secretKey",
+  store: new pgSession({
+    pool: pool,
+    tableName: 'session', // matches your table definition
+  }),
+  secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 8 * 60 * 60 * 1000, // 8 hours
+  }
 }));
-app.use(passport.initialize());
-app.use(passport.session());
+
+app.use((req, res, next) => {
+  console.log("CHECK_REQ_SESSION_USER:", req.session.user);
+  res.locals.user = req.session.user || null;
+console.log('User in res.locals:', res.locals.user); // Debug here
+  next();
+});
+
 app.use(flash());
 app.set('view engine', 'html');
 
@@ -38,41 +53,6 @@ app.engine('html', require('ejs').renderFile);
 app.use((req, res, next) => {
   res.locals.currentPage = req.path.split('/')[1] || 'home';
   next();
-});
-
-// Passport configuration
-passport.use(new LocalStrategy(
-  async (username, password, done) => {
-    try {
-      const userResult = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
-      if (userResult.rows.length === 0) {
-        return done(null, false, { message: 'Incorrect username.' });
-      }
-      
-      const user = userResult.rows[0];
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
-      
-      return done(null, user);
-    } catch (err) {
-      return done(err);
-    }
-  }
-));
-
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
-    done(null, userResult.rows[0]);
-  } catch (err) {
-    done(err);
-  }
 });
 
 // Routes

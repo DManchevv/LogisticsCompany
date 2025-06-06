@@ -1,25 +1,27 @@
 // Toggle password visibility
 document.addEventListener('DOMContentLoaded', function() {
-  const togglePassword = document.getElementById('togglePassword');
-  if (togglePassword) {
-    togglePassword.addEventListener('click', function() {
-      const passwordInput = document.getElementById('password');
+  // For login page
+  const loginToggle = document.querySelector('#login-page #togglePassword');
+  if (loginToggle) {
+    loginToggle.addEventListener('click', function() {
+      const passwordInput = document.querySelector('#login-page #password');
       const icon = this.querySelector('i');
-      
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-      } else {
-        passwordInput.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-      }
+      togglePasswordVisibility(passwordInput, icon);
     });
   }
   
-  // Form validation for registration
-  const registerForm = document.querySelector('form[action="/register"]');
+  // For register page
+  const registerToggle = document.querySelector('#register-page #togglePassword');
+  if (registerToggle) {
+    registerToggle.addEventListener('click', function() {
+      const passwordInput = document.querySelector('#register-page #password');
+      const icon = this.querySelector('i');
+      togglePasswordVisibility(passwordInput, icon);
+    });
+  }
+  
+  // Password validation for registration
+  const registerForm = document.querySelector('form[action="/auth/register"]');
   if (registerForm) {
     registerForm.addEventListener('submit', function(e) {
       const password = document.getElementById('password').value;
@@ -37,3 +39,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+function togglePasswordVisibility(input, icon) {
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+}

@@ -1,76 +1,795 @@
-<%- include('partials/head', {
-    title: 'Home - ProjectHelp',
-    styles: `
-        .hero {
-            background: linear-gradient(135deg, #4361ee, #3a0ca3);
-            color: white;
-            padding: 5rem 0;
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        .features {
-            padding: 4rem 0;
-        }
-    `,
-    currentPage: 'home'
-}); %>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Logistics Company</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gray: #7f8c8d;
+            --border-radius: 8px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
 
-<%- include('partials/navbar', {
-    currentPage: 'home',
-    user: user // Pass user data from your route
-}); %>
+				.user-info {
+					display: flex;
+					align-items: center;
+					gap: 10px;
+					margin-bottom: 1rem;
+				}
 
-<section class="hero">
-    <div class="container">
-        <h1 class="display-4 fw-bold">Get the Help You Need</h1>
-        <p class="lead">ProjectHelp connects you with experts to solve your technical challenges</p>
-        <div class="mt-4">
-            <% if (user) { %>
-                <a href="/dashboard" class="btn btn-light btn-lg me-2">
-                    <i class="fas fa-tachometer-alt me-1"></i> Go to Dashboard
-                </a>
-            <% } else { %>
-                <a href="/auth/register" class="btn btn-light btn-lg me-2">
-                    <i class="fas fa-user-plus me-1"></i> Get Started
-                </a>
-            <% } %>
-            <a href="/projects" class="btn btn-outline-light btn-lg">
-                <i class="fas fa-project-diagram me-1"></i> Browse Projects
+				.client-name {
+					margin-left: 8px;
+					color: white;
+				}
+
+				.user-info i {
+					margin-top: 50%;
+					color: white;
+				}
+
+				.logout-link {
+					margin-left: 10px;
+					color: red;
+					text-decoration: none;
+				} 
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.9)), url('https://images.unsplash.com/photo-1504805572947-34fad45aed93?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 120px 0 80px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 1.5rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            opacity: 0.9;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-outline-light {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+        
+        .btn-outline-light:hover {
+            background: white;
+            color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+        }
+        
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--gray);
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            text-align: center;
+            height: 100%;
+            transition: var(--transition);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+        }
+        
+        .feature-icon i {
+            font-size: 2.5rem;
+            color: var(--secondary);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            color: var(--gray);
+        }
+        
+        /* Tracking Section */
+        .tracking {
+            background: linear-gradient(to right, var(--primary), #1a2530);
+            color: white;
+            padding: 80px 0;
+        }
+        
+        .tracking-container {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 50px;
+        }
+        
+        .tracking-content {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .tracking-form {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .tracking-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .tracking-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .tracking-form h3 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        /* Services Section */
+        .services {
+            padding: 80px 0;
+            background: var(--light);
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            height: 100%;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .service-img {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .service-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        
+        .service-card:hover .service-img img {
+            transform: scale(1.1);
+        }
+        
+        .service-content {
+            padding: 25px;
+        }
+        
+        .service-content h3 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .service-content p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .service-content a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 60;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .service-content a i {
+            margin-left: 5px;
+            transition: var(--transition);
+        }
+        
+        .service-content a:hover i {
+            transform: translateX(5px);
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 80px 0;
+        }
+        
+        .testimonial-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            position: relative;
+            margin: 30px 15px;
+        }
+        
+        .testimonial-card::before {
+            content: '"';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 4rem;
+            color: rgba(52, 152, 219, 0.1);
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+        
+        .testimonial-content {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+        
+        .author-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+        
+        .author-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .author-info h4 {
+            margin: 0;
+            color: var(--primary);
+        }
+        
+        .author-info p {
+            color: var(--gray);
+            margin: 0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 80px 0 50px;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            .section-header h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- DEBUG -->
+    <!-- Navbar (You'll need to include your actual navbar partial) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shipping-fast me-2"></i>
+                Logistics Company
             </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/services">
+                            <i class="fas fa-truck me-1"></i> Services
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/tracking">
+                            <i class="fas fa-map-marker-alt me-1"></i> Tracking
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">
+                            <i class="fas fa-phone me-1"></i> Contact
+                        </a>
+                    </li>
+                </ul>
+								<% user %>
+								<% if (user) { %>
+									<div class="user-info">
+										<i class="fas fa-user"></i>
+									</div>
+										<span class="client-name"><%= user %></span>
+										<a href="/auth/logout" class="logout-link">Logout</a>
+									</div>
+								<% } else { %>
+									<ul class="navbar-nav">
+											<li class="nav-item">
+													<a class="nav-link" href="/auth/login">
+															<i class="fas fa-sign-in-alt me-1"></i> Login
+													</a>
+											</li>
+											<li class="nav-item">
+													<a class="btn btn-outline-light" href="/auth/register">
+															<i class="fas fa-user-plus me-1"></i> Register
+													</a>
+											</li>
+									</ul>
+								<% } %>
+            </div>
         </div>
-    </div>
-</section>
+    </nav>
 
-<section class="features">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon bg-primary text-white p-4 rounded-circle d-inline-block mb-3">
-                    <i class="fas fa-users fa-2x"></i>
-                </div>
-                <h3>Find Experts</h3>
-                <p>Connect with skilled professionals for your project needs.</p>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon bg-success text-white p-4 rounded-circle d-inline-block mb-3">
-                    <i class="fas fa-handshake fa-2x"></i>
-                </div>
-                <h3>Collaborate</h3>
-                <p>Work together using our platform's built-in tools.</p>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon bg-warning text-white p-4 rounded-circle d-inline-block mb-3">
-                    <i class="fas fa-rocket fa-2x"></i>
-                </div>
-                <h3>Launch Projects</h3>
-                <p>Bring your ideas to life with the right support.</p>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Deliver with Confidence, Receive with Ease</h1>
+            <p>Fast, reliable, and secure logistics solutions for all your shipping needs. Wherever you need it, whenever you need it.</p>
+            <div class="hero-buttons">
+                <% if (user) { %>
+                    <a href="/dashboard/send-package" class="btn btn-primary">
+                        <i class="fas fa-box me-2"></i> Send a Package
+                    </a>
+                <% } else { %>
+                    <a href="/auth/register" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i> Get Started
+                    </a>
+                <% } %>
+                <a href="/tracking" class="btn btn-outline-light">
+                    <i class="fas fa-search me-2"></i> Track a Shipment
+                </a>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<%- include('partials/footer'); %>
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Choose Us</h2>
+                <p>We provide logistics solutions that ensure your packages are delivered safely and on time</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <h3>Fast Delivery</h3>
+                        <p>Express shipping options with guaranteed delivery times for urgent shipments.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Secure Handling</h3>
+                        <p>Advanced security measures to ensure your packages arrive safely and intact.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h3>Global Reach</h3>
+                        <p>International shipping to over 200 countries with customs clearance support.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h3>24/7 Support</h3>
+                        <p>Our customer service team is available around the clock to assist you.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <h3>Competitive Pricing</h3>
+                        <p>Affordable rates without compromising on service quality or reliability.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <h3>Real-Time Tracking</h3>
+                        <p>Monitor your shipment's journey from pickup to delivery with live updates.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tracking Section -->
+    <section class="tracking">
+        <div class="container">
+            <div class="tracking-container">
+                <div class="tracking-content">
+                    <h2>Track Your Shipment</h2>
+                    <p>Enter your tracking number to get real-time updates on your package's location and estimated delivery time.</p>
+                    <div class="mt-4">
+                        <a href="/services" class="btn btn-outline-light">
+                            <i class="fas fa-info-circle me-2"></i> Learn More About Services
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="tracking-form">
+                    <h3>Track Package</h3>
+                    <form>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Enter Tracking Number" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-search me-2"></i> Track Now
+                        </button>
+                    </form>
+                    <div class="mt-3 text-center">
+                        <a href="/help" class="text-muted">Need help finding your tracking number?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Services</h2>
+                <p>Comprehensive logistics solutions tailored to your specific needs</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="service-card">
+                        <div class="service-img">
+                            <img src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Domestic Shipping">
+                        </div>
+                        <div class="service-content">
+                            <h3>Domestic Shipping</h3>
+                            <p>Fast and reliable delivery services within the country with next-day options available.</p>
+                            <a href="/services/domestic">
+                                Learn More <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="service-card">
+                        <div class="service-img">
+                            <img src="https://images.unsplash.com/photo-1533750349088-cd871a92f312?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="International Shipping">
+                        </div>
+                        <div class="service-content">
+                            <h3>International Shipping</h3>
+                            <p>Global delivery solutions with customs clearance and package consolidation.</p>
+                            <a href="/services/international">
+                                Learn More <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="service-card">
+                        <div class="service-img">
+                            <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Freight Services">
+                        </div>
+                        <div class="service-content">
+                            <h3>Freight Services</h3>
+                            <p>Heavy cargo and pallet shipments with specialized handling and transportation.</p>
+                            <a href="/services/freight">
+                                Learn More <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2>What Our Customers Say</h2>
+                <p>Trusted by businesses and individuals worldwide</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <p>Their international shipping service saved our business when we had urgent documents to deliver. Fast and reliable!</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-img">
+                                <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Sarah Johnson">
+                            </div>
+                            <div class="author-info">
+                                <h4>Sarah Johnson</h4>
+                                <p>Small Business Owner</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <p>The real-time tracking feature gives me peace of mind knowing exactly where my packages are at all times.</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-img">
+                                <img src="https://randomuser.me/api/portraits/men/54.jpg" alt="Michael Chen">
+                            </div>
+                            <div class="author-info">
+                                <h4>Michael Chen</h4>
+                                <p>E-commerce Seller</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <p>Their customer support team went above and beyond to resolve a customs issue for us. Highly recommended!</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-img">
+                                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Emma Rodriguez">
+                            </div>
+                            <div class="author-info">
+                                <h4>Emma Rodriguez</h4>
+                                <p>Import/Export Manager</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer (You'll need to include your actual footer partial) -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h3 class="mb-3">
+                        <i class="fas fa-shipping-fast me-2"></i> Logistics Company
+                    </h3>
+                    <p>Delivering excellence through reliable and efficient logistics solutions worldwide.</p>
+                    <div class="social-icons mt-3">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/" class="text-white text-decoration-none">Home</a></li>
+                        <li class="mb-2"><a href="/services" class="text-white text-decoration-none">Services</a></li>
+                        <li class="mb-2"><a href="/tracking" class="text-white text-decoration-none">Tracking</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-white text-decoration-none">Contact</a></li>
+                        <li><a href="/about" class="text-white text-decoration-none">About Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 col-md-4 mb-4">
+                    <h5 class="mb-3">Services</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Domestic Shipping</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">International Shipping</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Freight Services</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Express Delivery</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Warehousing</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 col-md-4 mb-4">
+                    <h5 class="mb-3">Contact Us</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> 123 Logistics St, Sofia, Bulgaria</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +359 888 123 456</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> info@logisticscompany.com</li>
+                        <li><i class="fas fa-clock me-2"></i> Mon-Fri: 8AM-8PM</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="bg-light">
+            
+            <div class="text-center pt-3">
+                <p>&copy; 2023 Logistics Company. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
