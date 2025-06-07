@@ -10,7 +10,7 @@ const path = require ('path');
 
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
-
+const staffRouter = require('./routes/staff');
 // Database connection
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -19,6 +19,10 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
 });
+
+const expressLayouts = require('express-ejs-layouts');
+app.use(expressLayouts);
+app.set('layout', 'backoffice/layout'); // default layout
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -38,9 +42,8 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
-  console.log("CHECK_REQ_SESSION_USER:", req.session.user);
-  res.locals.user = req.session.user || null;
-console.log('User in res.locals:', res.locals.user); // Debug here
+  res.locals.user = req.session.user && req.session.user.name ? req.session.user.name : null;
+	console.log("REQ_SESSION_USER:", req.session.user);
   next();
 });
 
@@ -68,6 +71,7 @@ const adminRouter = require('./routes/admin');
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/bo/staff', staffRouter);
 app.use('/admin', adminRouter);
 app.use('/auth', authRoutes);
 app.use('/clients', clientRoutes);

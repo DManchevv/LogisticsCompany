@@ -1,0 +1,65 @@
+<!-- views/backoffice/staff/add.ejs -->
+
+<h1>Add New Staff Member</h1>
+
+<% if (errors && errors.length > 0) { %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% errors.forEach(error => { %>
+        <li><%= error.msg %></li>
+      <% }) %>
+    </ul>
+  </div>
+<% } %>
+
+<form action="/bo/staff/add" method="POST" novalidate>
+  <div class="mb-3">
+    <label for="first_name" class="form-label">First Name *</label>
+    <input
+      type="text"
+      id="first_name"
+      name="first_name"
+      class="form-control"
+      value="<%= formData.first_name || '' %>"
+      required
+    >
+  </div>
+
+  <div class="mb-3">
+    <label for="last_name" class="form-label">Last Name *</label>
+    <input
+      type="text"
+      id="last_name"
+      name="last_name"
+      class="form-control"
+      value="<%= formData.last_name || '' %>"
+      required
+    >
+  </div>
+
+  <div class="mb-3">
+    <label for="position" class="form-label">Position *</label>
+    <select id="position" name="position" class="form-select" required>
+      <option value="" disabled <%= !formData.position ? 'selected' : '' %>>Select position</option>
+      <option value="courier" <%= formData.position === 'courier' ? 'selected' : '' %>>Courier</option>
+      <option value="office" <%= formData.position === 'office' ? 'selected' : '' %>>Office</option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label for="office_id" class="form-label">Office ID</label>
+    <input
+      type="number"
+      id="office_id"
+      name="office_id"
+      class="form-control"
+      value="<%= formData.office_id || '' %>"
+      min="1"
+    >
+  </div>
+
+  <button type="submit" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Add Staff Member
+  </button>
+  <a href="/bo/staff" class="btn btn-secondary ms-2">Cancel</a>
+</form>

@@ -1,0 +1,23 @@
+<% layout('backoffice/layout', { title: 'Staff Roles', active: 'staff-roles' }) %>
+
+<table class="table table-hover table-bordered">
+  <thead class="table-secondary">
+    <tr>
+      <th>Staff Member</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (staffRoles.length === 0) { %>
+      <tr>
+        <td colspan="2" class="text-center">No staff roles found.</td>
+      </tr>
+    <% } %>
+    <% staffRoles.forEach(sr => { %>
+      <tr>
+        <td><%= sr.first_name %> <%= sr.last_name %></td>
+        <td><%= sr.role_name %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table

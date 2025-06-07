@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 
 // About route
 router.get('/about', (req, res) => {
-    res.render('about', { title: 'About Us' });
+    res.render('about.ejs', { title: 'About Us' });
 });
 
 // Add other routes as needed

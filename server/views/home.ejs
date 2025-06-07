@@ -42,6 +42,10 @@
 					text-decoration: none;
 				} 
 
+				.bg-dark {
+					background-color: rgb(1 1 1) !important;
+				}
+
         * {
             margin: 0;
             padding: 0;
@@ -428,63 +432,8 @@
 <body>
 <!-- DEBUG -->
     <!-- Navbar (You'll need to include your actual navbar partial) -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-shipping-fast me-2"></i>
-                Logistics Company
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/">
-                            <i class="fas fa-home me-1"></i> Home
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/services">
-                            <i class="fas fa-truck me-1"></i> Services
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/tracking">
-                            <i class="fas fa-map-marker-alt me-1"></i> Tracking
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/contact">
-                            <i class="fas fa-phone me-1"></i> Contact
-                        </a>
-                    </li>
-                </ul>
-								<% user %>
-								<% if (user) { %>
-									<div class="user-info">
-										<i class="fas fa-user"></i>
-									</div>
-										<span class="client-name"><%= user %></span>
-										<a href="/auth/logout" class="logout-link">Logout</a>
-									</div>
-								<% } else { %>
-									<ul class="navbar-nav">
-											<li class="nav-item">
-													<a class="nav-link" href="/auth/login">
-															<i class="fas fa-sign-in-alt me-1"></i> Login
-													</a>
-											</li>
-											<li class="nav-item">
-													<a class="btn btn-outline-light" href="/auth/register">
-															<i class="fas fa-user-plus me-1"></i> Register
-													</a>
-											</li>
-									</ul>
-								<% } %>
-            </div>
-        </div>
-    </nav>
+
+		<%- include('./partials/navbar') %>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -493,7 +442,7 @@
             <p>Fast, reliable, and secure logistics solutions for all your shipping needs. Wherever you need it, whenever you need it.</p>
             <div class="hero-buttons">
                 <% if (user) { %>
-                    <a href="/dashboard/send-package" class="btn btn-primary">
+                    <a href="/clients/send-package" class="btn btn-primary">
                         <i class="fas fa-box me-2"></i> Send a Package
                     </a>
                 <% } else { %>
@@ -733,62 +682,7 @@
     </section>
 
     <!-- Footer (You'll need to include your actual footer partial) -->
-    <footer class="bg-dark text-white py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <h3 class="mb-3">
-                        <i class="fas fa-shipping-fast me-2"></i> Logistics Company
-                    </h3>
-                    <p>Delivering excellence through reliable and efficient logistics solutions worldwide.</p>
-                    <div class="social-icons mt-3">
-                        <a href="#" class="text-white me-3"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-white me-3"><i class="fab fa-linkedin"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-                
-                <div class="col-lg-2 col-md-4 mb-4">
-                    <h5 class="mb-3">Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/" class="text-white text-decoration-none">Home</a></li>
-                        <li class="mb-2"><a href="/services" class="text-white text-decoration-none">Services</a></li>
-                        <li class="mb-2"><a href="/tracking" class="text-white text-decoration-none">Tracking</a></li>
-                        <li class="mb-2"><a href="/contact" class="text-white text-decoration-none">Contact</a></li>
-                        <li><a href="/about" class="text-white text-decoration-none">About Us</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3 col-md-4 mb-4">
-                    <h5 class="mb-3">Services</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Domestic Shipping</a></li>
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">International Shipping</a></li>
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Freight Services</a></li>
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Express Delivery</a></li>
-                        <li><a href="#" class="text-white text-decoration-none">Warehousing</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3 col-md-4 mb-4">
-                    <h5 class="mb-3">Contact Us</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> 123 Logistics St, Sofia, Bulgaria</li>
-                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +359 888 123 456</li>
-                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> info@logisticscompany.com</li>
-                        <li><i class="fas fa-clock me-2"></i> Mon-Fri: 8AM-8PM</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <hr class="bg-light">
-            
-            <div class="text-center pt-3">
-                <p>&copy; 2023 Logistics Company. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    <%- include('./partials/footer') %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -100,17 +100,11 @@ exports.login = async (req, res) => {
 			return res.redirect('/auth/login');
 		}
 
-    const user = username;
-    req.session.user = user;
+		req.session.user = {};
+    req.session.user.name = username;
+		req.session.user.role = 'client';
 
-		console.log("NEW_USER_IS:", user);
-
-    if (user.role === 'employee') {
-      return res.redirect('/');
-    } else {
-      return res.redirect('/');
-    }
-
+		res.redirect('/');
   } catch (err) {
     console.error('Login error:', err);
     req.flash('error', 'An error occurred during login');

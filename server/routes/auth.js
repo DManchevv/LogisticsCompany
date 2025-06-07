@@ -9,7 +9,6 @@ router.get('/login', (req, res) => {
     title: 'Login',
     error: req.flash('error'),
     pageName: 'login',
-    user: req.user
   });
 });
 
@@ -19,7 +18,6 @@ router.get('/register', (req, res) => {
     title: 'Register',
     error: req.flash('error'),
     pageName: 'register',
-    user: req.user
   });
 });
 
@@ -31,7 +29,6 @@ router.get('/admin-login', (req, res) => {
   res.render('auth/admin-login.ejs', {
     title: 'Admin Login',
     currentPage: 'admin-login',
-    user: req.user,
     error_msg: req.flash('error_msg')
   });
 });
@@ -41,7 +38,6 @@ router.get('/admin-login', (req, res) => {
     res.render('auth/admin-login.ejs', { 
         title: 'Admin Login',
         currentPage: 'admin-login',
-        user: req.user,
         error_msg: req.flash('error_msg')
     });
 });

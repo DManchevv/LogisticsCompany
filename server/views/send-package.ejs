@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Package</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+			html,body {
+				min-height: 100% !important;
+			}
+
+			/* Send Package Form Styles */
+			.package-form form {
+					max-width: 600px;
+					margin: 0 auto;
+					text-align: left;
+					background: rgba(255, 255, 255, 0.05);
+					padding: 40px;
+					border-radius: var(--border-radius);
+					box-shadow: var(--box-shadow);
+			}
+
+			.package-form label {
+					display: block;
+					margin-bottom: 5px;
+					font-weight: 600;
+					color: #ecf0f1;
+			}
+
+			.package-form input[type="text"],
+			.package-form input[type="number"] {
+					width: 100%;
+					padding: 12px 15px;
+					margin-bottom: 20px;
+					border: none;
+					border-radius: var(--border-radius);
+					font-size: 1rem;
+					background-color: rgba(255, 255, 255, 0.2);
+					color: white;
+			}
+
+			.package-form input[type="text"]::placeholder,
+			.package-form input[type="number"]::placeholder {
+					color: rgba(255, 255, 255, 0.6);
+			}
+
+			.package-form input:focus {
+					outline: none;
+					background-color: rgba(255, 255, 255, 0.3);
+					box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.4);
+			}
+
+			.package-form textarea#description {
+				background-color: rgba(255, 255, 255, 0.3);
+				width: 100%;
+        color: white;
+				padding: 15px;
+				border: none;
+				border-radius: var(--border-radius);
+				font-size: 1rem;
+				resize: vertical;
+			}
+
+			.package-form textarea#description:focus {
+				border-color: var(--secondary);
+				outline: none;
+				box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+			}
+
+			.package-form button[type="submit"] {
+					width: 100%;
+					padding: 12px;
+					background: var(--secondary);
+					color: white;
+					border: none;
+					border-radius: var(--border-radius);
+					font-size: 1.1rem;
+					font-weight: bold;
+					cursor: pointer;
+					transition: var(--transition);
+			}
+
+			.package-form button[type="submit"]:hover {
+					background: #2980b9;
+					transform: translateY(-2px);
+					box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+			}
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gray: #7f8c8d;
+            --border-radius: 8px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+				.user-info {
+					display: flex;
+					align-items: center;
+					gap: 10px;
+					margin-bottom: 1rem;
+				}
+
+				.client-name {
+					margin-left: 8px;
+					color: white;
+				}
+
+				.user-info i {
+					margin-top: 50%;
+					color: white;
+				}
+
+				.logout-link {
+					margin-left: 10px;
+					color: red;
+					text-decoration: none;
+				} 
+
+				.bg-dark {
+					background-color: rgb(1 1 1) !important;
+				}
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Hero Section */
+        .package-form {
+            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.9)) !important; 
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 120px 0 80px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 1.5rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            opacity: 0.9;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-outline-light {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+        
+        .btn-outline-light:hover {
+            background: white;
+            color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+        }
+        
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--gray);
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            text-align: center;
+            height: 100%;
+            transition: var(--transition);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+        }
+        
+        .feature-icon i {
+            font-size: 2.5rem;
+            color: var(--secondary);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            color: var(--gray);
+        }
+        
+        /* Tracking Section */
+        .tracking {
+            background: linear-gradient(to right, var(--primary), #1a2530);
+            color: white;
+            padding: 80px 0;
+        }
+        
+        .tracking-container {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 50px;
+        }
+        
+        .tracking-content {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .tracking-form {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .tracking-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .tracking-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .tracking-form h3 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        /* Services Section */
+        .services {
+            padding: 80px 0;
+            background: var(--light);
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            height: 100%;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .service-img {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .service-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        
+        .service-card:hover .service-img img {
+            transform: scale(1.1);
+        }
+        
+        .service-content {
+            padding: 25px;
+        }
+        
+        .service-content h3 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .service-content p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .service-content a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 60;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .service-content a i {
+            margin-left: 5px;
+            transition: var(--transition);
+        }
+        
+        .service-content a:hover i {
+            transform: translateX(5px);
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 80px 0;
+        }
+        
+        .testimonial-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            position: relative;
+            margin: 30px 15px;
+        }
+        
+        .testimonial-card::before {
+            content: '"';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 4rem;
+            color: rgba(52, 152, 219, 0.1);
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+        
+        .testimonial-content {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+        
+        .author-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+        
+        .author-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .author-info h4 {
+            margin: 0;
+            color: var(--primary);
+        }
+        
+        .author-info p {
+            color: var(--gray);
+            margin: 0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 80px 0 50px;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            .section-header h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('./partials/navbar') %>
+
+    <!-- Form -->
+    <section class="package-form">
+        <div class="container">
+					<h2 class="mb-4">Send a Package</h2>
+					<form action="/clients/send-package" method="POST">
+							<div class="form-group mb-3">
+                <label for="recipient_first_name">Recipient First Name</label>
+                <input type="text" id="recipient_first_name" name="recipient_first_name" required />
+                <label for="recipient_last_name">Recipient Last Name</label>
+                <input type="text" id="recipient_last_name" name="recipient_last_name" required />
+							</div>
+
+							<div class="form-group mb-3">
+								<label for="recipient_address">Recipient Address</label>
+								<input type="text" name="recipient_address" id="recipient_address" placeholder="123 Main St, City, Country" required>
+							</div>
+
+							<div class="form-group mb-3">
+								<label for="description">Package Description</label>
+								<textarea name="description" id="description" rows="4" required></textarea>
+							</div>
+
+
+							<div class="form-group mb-3">
+							  <label for="weight">Package Weight (kg):</label>
+							  <input type="number" step="0.01" id="weight" name="weight" required>
+							</div>
+
+							<div class="form-group mb-4">
+								<label for="package_price">Package Price (€)</label>
+								<input type="number" step="0.01" name="package_price" id="package_price" placeholder="49.99" required>
+							</div>
+
+							<button type="submit">Send Package</button>
+					</form>
+        </div>
+    </section>
+
+    <%- include('./partials/footer') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

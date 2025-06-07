@@ -1,61 +1,56 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container">
-    <a class="navbar-brand" href="/">
-      <i class="fas fa-shipping-fast me-2"></i>
-      Logistics Company
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link <%= currentPage === 'home' ? 'active' : '' %>" href="/">
-            <i class="fas fa-home me-1"></i> Home
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link <%= currentPage === 'services' ? 'active' : '' %>" href="/services">
-            <i class="fas fa-truck me-1"></i> Services
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link <%= currentPage === 'tracking' ? 'active' : '' %>" href="/tracking">
-            <i class="fas fa-map-marker-alt me-1"></i> Tracking
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link <%= currentPage === 'contact' ? 'active' : '' %>" href="/contact">
-            <i class="fas fa-phone me-1"></i> Contact
-          </a>
-        </li>
-      </ul>
-      <ul class="navbar-nav">
-        <% if (user) { %>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-              <i class="fas fa-user-circle me-1"></i> <%= user.name %>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
-              <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i> Profile</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-shipping-fast me-2"></i>
+            Logistics Company
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/">
+                        <i class="fas fa-home me-1"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/services">
+                        <i class="fas fa-truck me-1"></i> Services
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/clients/pending-shipments">
+                        <i class="fas fa-map-marker-alt me-1"></i> My Pending Shipments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">
+                        <i class="fas fa-phone me-1"></i> Contact
+                    </a>
+                </li>
             </ul>
-          </li>
-        <% } else { %>
-          <li class="nav-item">
-            <a class="nav-link <%= currentPage === 'login' ? 'active' : '' %>" href="/auth/login">
-              <i class="fas fa-sign-in-alt me-1"></i> Login
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="btn btn-outline-light" href="/auth/register">
-              <i class="fas fa-user-plus me-1"></i> Register
-            </a>
-          </li>
-        <% } %>
-      </ul>
+            <% user %>
+            <% if (user) { %>
+              <div class="user-info">
+                <i class="fas fa-user"></i>
+              </div>
+							<span class="client-name"><%= user %></span>
+							<a href="/auth/logout" class="logout-link">Logout</a>
+            <% } else { %>
+              <ul class="navbar-nav">
+                  <li class="nav-item">
+                      <a class="btn btn-outline-light" href="/auth/login">
+                          <i class="fas fa-sign-in-alt me-1"></i> Login
+                      </a>
+                  </li>
+                  <li class="nav-item" style="margin-left:1rem;">
+                      <a class="btn btn-outline-primary" href="/auth/register">
+                          <i class="fas fa-user-plus me-1"></i> Register
+                      </a>
+                  </li>
+              </ul>
+            <% } %>
+        </div>
     </div>
-  </div>
 </nav>
