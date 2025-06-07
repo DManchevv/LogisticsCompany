@@ -6,6 +6,11 @@ async function getAllStaff() {
   return res.rows;
 }
 
+async function getAllActiveStaff() {
+  const result = await staff_pool.query(`SELECT id, first_name, last_name FROM staff WHERE active = TRUE ORDER BY last_name`);
+  return result.rows;
+}
+
 async function getStaffById(id) {
   const res = await staff_pool.query('SELECT * FROM staff WHERE id = $1', [id]);
   return res.rows[0];
@@ -35,6 +40,7 @@ async function deleteStaff(id) {
 
 module.exports = {
   getAllStaff,
+	getAllActiveStaff,
   getStaffById,
   createStaff,
   updateStaff,

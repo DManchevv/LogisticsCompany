@@ -1,0 +1,43 @@
+<h1>Assign Role to Staff</h1>
+
+<% if (errors && errors.length > 0) { %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% errors.forEach(err => { %>
+        <li><%= err.msg %></li>
+      <% }) %>
+    </ul>
+  </div>
+<% } %>
+
+<form method="POST" action="/bo/staff-roles/add">
+  <div class="mb-3">
+    <label for="staff_id" class="form-label">Staff Member</label>
+    <select name="staff_id" id="staff_id" class="form-select" required>
+      <option value="">Select Staff</option>
+      <% staff.forEach(s => { %>
+        <option value="<%= s.id %>" <%= formData.staff_id == s.id ? 'selected' : '' %>>
+          <%= s.first_name %> <%= s.last_name %> (ID: <%= s.id %>)
+        </option>
+      <% }) %>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label for="role_id" class="form-label">Role</label>
+    <select name="role_id" id="role_id" class="form-select" required>
+      <option value="">Select Role</option>
+      <% roles.forEach(r => { %>
+        <option value="<%= r.id %>" <%= formData.role_id == r.id ? 'selected' : '' %>>
+          <%= r.name %>
+        </option>
+      <% }) %>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary">
+    <i class="fas fa-save"></i> Assign Role
+  </button>
+
+  <a href="/bo/staff-roles" class="btn btn-secondary ms-2">Cancel</a>
+</form>

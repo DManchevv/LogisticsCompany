@@ -7,11 +7,12 @@ const flash = require('express-flash');
 const app = express();
 const port = process.env.PORT || 3000;
 const path = require ('path');
+const boStaffRolesRouter = require('./routes/staffRoles');
 
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
 const staffRouter = require('./routes/staff');
-// Database connection
+
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -79,6 +80,7 @@ app.use('/employees', employeeRoutes);
 app.use('/offices', officeRoutes);
 app.use('/shipments', shipmentRoutes);
 app.use('/reports', reportRoutes);
+app.use('/bo/staff-roles', boStaffRolesRouter);
 
 // Start server
 app.listen(port, () => {
