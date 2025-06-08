@@ -3,6 +3,8 @@ const router = express.Router();
 const shipmentModel = require('../models/shipment');
 const officeModel = require('../models/office');
 const userModel = require('../models/user');
+const { ensureAuthenticated, ensureClient, ensureBackoffice } = require('../middlewares/auth');
+const { staff_pool } = require('../dbUtils');
 
 // List all shipments
 router.get('/', async (req, res) => {
@@ -70,26 +72,42 @@ router.post('/add', async (req, res) => {
 });
 
 router.get('/edit/:id', async (req, res) => {
-  const id = req.params.id;
-  const shipment = await shipmentModel.getShipmentById(id);
-  const offices = await officeModel.getAllOffices();
-  const users = await userModel.getAllUsers();
+  const { id } = req.params;
 
-  if (!shipment) {
-    req.flash('error', 'Shipment not found');
-    return res.redirect('/bo/shipments');
+  try {
+    const shipmentRes = await staff_pool.query('SELECT * FROM shipments WHERE id = $1', [id]);
+    if (shipmentRes.rows.length === 0) {
+      req.flash('error', 'Shipment not found.');
+      return res.redirect('/bo/shipments');
+    }
+    const shipment = shipmentRes.rows[0];
+
+    const officesRes = await staff_pool.query('SELECT id, name FROM offices ORDER BY name');
+    const usersRes = await staff_pool.query('SELECT id, username FROM users ORDER BY username');
+
+    let receiverUser = "asd";
+    if (shipment.status !== 'pending' && shipment.receiver_id) {
+      const receiverRes = await staff_pool.query('SELECT id, username FROM users WHERE id = $1', [shipment.receiver_id]);
+      receiverUser = receiverRes.rows[0];
+    }
+
+    res.render('backoffice/shipments/edit.ejs', {
+      shipment,
+      offices: officesRes.rows,
+      users: usersRes.rows,
+      receiverUser,
+      errors: null,
+      formData: shipment,
+      layout: 'backoffice/layout.ejs',
+      title: 'Edit Shipment',
+      active: 'shipments'
+    });
+
+  } catch (err) {
+    console.error('Error loading shipment for edit:', err);
+    req.flash('error', 'Failed to load shipment.');
+    res.redirect('/bo/shipments');
   }
-
-  res.render('backoffice/shipments/edit.ejs', {
-    title: 'Edit Shipment',
-    layout: 'backoffice/layout.ejs',
-    active: 'shipments',
-    shipment,
-    offices,
-    users,
-    errors: [],
-    formData: shipment  // prefill form fields
-  });
 });
 
 router.post('/edit/:id', async (req, res) => {
@@ -106,12 +124,20 @@ router.post('/edit/:id', async (req, res) => {
 	  await updateShipment(id, formData);
 	  res.redirect('/bo/shipments');
 	} catch (err) {
+		let shipment = formData;
+		let receiverUser = null;
+    if (shipment.status !== 'pending' && shipment.receiver_id) {
+      const receiverRes = await staff_pool.query('SELECT id, username FROM users WHERE id = $1', [shipment.receiver_id]);
+      receiverUser = receiverRes.rows[0];
+    }
+
 		return res.render('backoffice/shipments/edit.ejs', {
 			shipment: { id },
 			title: 'Edit Shipment',
 			active: 'shipments',
 			layout: 'backoffice/layout.ejs',
 			offices,
+			receiverUser,
 			users,
 			errors: [err],
 			formData
