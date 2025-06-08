@@ -1,0 +1,21 @@
+<h2>Edit Role: <%= role.name %></h2>
+
+<form action="/bo/roles/edit/<%= role.id %>" method="POST">
+  <div class="mb-3">
+    <label class="form-label">Role Name</label>
+    <input type="text" value="<%= role.name %>" class="form-control" disabled>
+  </div>
+
+  <div class="mb-3">
+    <label for="permissions" class="form-label">Permissions</label>
+    <select name="permissions" id="permissions" class="form-select" multiple size="6">
+      <% permissions.forEach(p => { %>
+        <option value="<%= p.id %>" <%= role.permission_ids.includes(p.id) ? 'selected' : '' %>>
+          <%= p.name %>
+        </option>
+      <% }) %>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Update Permissions</button>
+</form>

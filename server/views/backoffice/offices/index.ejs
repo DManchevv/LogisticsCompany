@@ -1,0 +1,36 @@
+<a href="/bo/offices/add" class="btn btn-success mb-3">
+  <i class="fas fa-plus"></i> Add New Office
+</a>
+
+<table class="table table-bordered table-striped align-middle">
+  <thead class="table-primary">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Address</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (offices.length === 0) { %>
+      <tr><td colspan="4" class="text-center">No offices found.</td></tr>
+    <% } %>
+    <% offices.forEach(office => { %>
+      <tr>
+        <td><%= office.id %></td>
+        <td><%= office.name %></td>
+        <td><%= office.address %></td>
+        <td>
+          <a href="/bo/offices/edit/<%= office.id %>" class="btn btn-sm btn-primary me-1">
+            <i class="fas fa-edit"></i> Edit
+          </a>
+          <form method="POST" action="/bo/offices/delete/<%= office.id %>" class="d-inline" onsubmit="return confirm('Are you sure?');">
+            <button type="submit" class="btn btn-sm btn-danger">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+    <% }); %>
+  </tbody>
+</table>

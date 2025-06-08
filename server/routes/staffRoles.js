@@ -7,7 +7,7 @@ const staffModel = require('../models/staff');
 
 router.get('/', async (req, res) => {
   try {
-    const assignments = await staffRolesModel.getAllAssignments();
+    const assignments = await staffRolesModel.getAll();
     res.render('backoffice/staff-roles/index.ejs', {
       title: 'Staff Roles',
       active: 'staff-roles',

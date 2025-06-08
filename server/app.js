@@ -23,7 +23,7 @@ const pool = new Pool({
 
 const expressLayouts = require('express-ejs-layouts');
 app.use(expressLayouts);
-app.set('layout', 'backoffice/layout'); // default layout
+app.set('layout', 'layouts/empty-layout.ejs'); // default layout
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -69,6 +69,7 @@ const reportRoutes = require('./routes/reports');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const adminRouter = require('./routes/admin');
+const rolesRouter = require('./routes/roles');
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -77,12 +78,12 @@ app.use('/admin', adminRouter);
 app.use('/auth', authRoutes);
 app.use('/clients', clientRoutes);
 app.use('/employees', employeeRoutes);
-app.use('/offices', officeRoutes);
-app.use('/shipments', shipmentRoutes);
+app.use('/bo/shipments', shipmentRoutes);
 app.use('/reports', reportRoutes);
 app.use('/bo/staff-roles', boStaffRolesRouter);
+app.use('/bo/roles', rolesRouter);
+app.use('/bo/offices', officeRoutes);
 
-// Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

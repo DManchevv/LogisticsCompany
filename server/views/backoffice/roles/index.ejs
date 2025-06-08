@@ -1,0 +1,32 @@
+<a href="/bo/roles/add" class="btn btn-success mb-3">
+  <i class="fas fa-plus"></i> Add New Role
+</a>
+
+<table class="table table-bordered table-striped">
+  <thead class="table-primary">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Permissions</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (roles.length === 0) { %>
+      <tr><td colspan="4" class="text-center">No roles found.</td></tr>
+    <% } else { %>
+      <% roles.forEach(role => { %>
+        <tr>
+          <td><%= role.id %></td>
+          <td><%= role.name %></td>
+          <td><%= role.permissions.join(', ') || '-' %></td>
+          <td>
+            <a href="/bo/roles/edit/<%= role.id %>" class="btn btn-sm btn-primary">
+              <i class="fas fa-edit"></i> Edit
+            </a>
+          </td>
+        </tr>
+      <% }) %>
+    <% } %>
+  </tbody>
+</table>

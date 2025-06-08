@@ -1,99 +1,127 @@
 const express = require('express');
 const router = express.Router();
-const clientController = require('../controllers/clientController');
-const authMiddleware = require('../middlewares/auth');
 const { ensureAuthenticated, ensureClient } = require('../middlewares/auth');
-const { insertPendingShipment, pool } = require('../dbUtils');
-
-router.use(authMiddleware.ensureAuthenticated);
-
-router.get('/send-package', ensureAuthenticated, ensureClient, (req, res) => {
-  res.render('send-package.ejs', { user: req.session.user, errors: null, formData: {} });
-});
-
+const { pool } = require('../dbUtils');
 const { body, validationResult } = require('express-validator');
 
-router.post('/send-package',
-  ensureAuthenticated,
+// Middleware
+router.use(ensureAuthenticated);
+
+// Show send package form
+router.get('/send-package', ensureClient, (req, res) => {
+  res.render('send-package.ejs', {
+    user: req.session.user.name,
+    errors: [],
+    formData: {},
+    title: 'Register Package'
+  });
+});
+
+// Handle form submission
+router.post(
+  '/send-package',
   ensureClient,
   [
-    // validation rules ...
+    body('recipient_first_name').notEmpty().withMessage('Recipient first name is required.'),
+    body('recipient_last_name').notEmpty().withMessage('Recipient last name is required.'),
+    body('recipient_address').notEmpty().withMessage('Delivery address is required.'),
+    body('weight').isFloat({ min: 0.1 }).withMessage('Weight must be at least 0.1 kg.'),
+    body('package_price').isFloat({ min: 0.01 }).withMessage('Price must be positive.'),
   ],
   async (req, res) => {
     const errors = validationResult(req);
     const formData = req.body;
 
     if (!errors.isEmpty()) {
-      return res.render('send-package', { errors: errors.array(), formData });
+      return res.render('send-package.ejs', {
+        user: req.session.user.name,
+        errors: errors.array(),
+        formData,
+        title: 'Register Package'
+      });
     }
 
     try {
-      // Get sender id from username
-      const senderUsername = req.session.user.name;
+      // Get sender_id from username
+      const { name: username } = req.session.user;
+      const senderRes = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
 
-      // Use helper function to insert pending shipment
-      await insertPendingShipment({
-        senderUsername: senderUsername,
-        recipient_first_name: formData.recipient_first_name,
-        recipient_last_name: formData.recipient_last_name,
-        delivery_address: formData.recipient_address,
-        weight: formData.weight,
-        price: formData.package_price,
-        description: formData.description || null,
-      });
+      if (senderRes.rowCount === 0) {
+        req.flash('error', 'User not found.');
+        return res.redirect('/');
+      }
+
+      const sender_id = senderRes.rows[0].id;
+
+      // Insert into shipments
+      await pool.query(`
+        INSERT INTO shipments (
+          sender_id,
+          recipient_first_name,
+          recipient_last_name,
+          delivery_address,
+          weight,
+          price,
+          description,
+          status
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
+      `, [
+        sender_id,
+        formData.recipient_first_name,
+        formData.recipient_last_name,
+        formData.recipient_address,
+        formData.weight,
+        formData.package_price,
+        formData.description || null
+      ]);
 
       req.flash('success', 'Package registered successfully!');
-      res.redirect('/clients/shipments');
+      res.redirect('/clients/pending-shipments');
 
     } catch (err) {
-      console.error('Error registering package:', err);
+      console.error('Error inserting shipment:', err);
       req.flash('error', 'Failed to register package.');
-      res.render('send-package.ejs', { errors: [{ msg: 'Server error' }], formData });
+      res.render('send-package.ejs', {
+        user: req.session.user.name,
+        errors: [{ msg: 'Server error' }],
+        formData,
+        title: 'Register Package'
+      });
     }
   }
 );
 
-router.get('/pending-shipments', ensureAuthenticated, ensureClient, async (req, res) => {
+// List pending shipments for logged-in client
+router.get('/pending-shipments', ensureClient, async (req, res) => {
   try {
-    // Get the logged-in user's ID (sender_id)
-    const senderUsername = req.session.user.name;
+    const username = req.session.user.name;
+    const userRes = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
 
-    // Get user id from username
-    const userRes = await pool.query('SELECT id FROM users WHERE username = $1', [senderUsername]);
-    if (userRes.rows.length === 0) {
+    if (userRes.rowCount === 0) {
       req.flash('error', 'User not found.');
       return res.redirect('/');
     }
-    const userId = userRes.rows[0].id;
 
-    // Fetch pending shipments for this client
-    const shipmentsRes = await pool.query(
-      `SELECT id, recipient_first_name, recipient_last_name, delivery_address, weight, price, description, created_at
-       FROM pending_shipments
-       WHERE sender_id = $1
-       ORDER BY created_at DESC`,
-      [userId]
-    );
+    const sender_id = userRes.rows[0].id;
 
-    const shipments = shipmentsRes.rows;
+    const shipmentsRes = await pool.query(`
+      SELECT id, recipient_first_name, recipient_last_name, delivery_address, weight, price, description, created_at
+      FROM shipments
+      WHERE sender_id = $1 AND status = 'pending'
+      ORDER BY created_at DESC
+    `, [sender_id]);
 
-    // Render the page with the shipments data
     res.render('client-pending-shipments.ejs', {
-      shipments,
-      errors: null,
+      shipments: shipmentsRes.rows,
+      title: 'Pending Shipments'
     });
 
   } catch (err) {
-    console.error('Error fetching client packages:', err);
-    req.flash('error', 'Failed to load packages.');
+    console.error('Error fetching shipments:', err);
+    req.flash('error', 'Failed to load shipments.');
     res.redirect('/');
   }
 });
 
-//router.get('/', clientController.getAllClients);
-//router.get('/:id', clientController.getClientById);
-//router.post('/', authMiddleware.ensureAdmin, clientController.createClient);
-//router.put('/:id', authMiddleware.ensureAdmin, clientController.updateClient);
-//router.delete('/:id', authMiddleware.ensureAdmin, clientController.deleteClient);
-
 module.exports = router;
+
