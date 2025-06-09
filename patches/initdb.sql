@@ -124,7 +124,7 @@ BEGIN
     -- Compare with bcrypt
     RETURN stored_hash = crypt(password_input, stored_hash);
 END;
-$function$
+$function$;
 
 GRANT SELECT,UPDATE,INSERT ON users TO client;
 
@@ -156,9 +156,9 @@ GRANT INSERT, UPDATE, SELECT ON session TO client;
 --  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 --);
 
-GRANT INSERT, UPDATE, SELECT ON pending_shipments TO client;
+--GRANT INSERT, UPDATE, SELECT ON pending_shipments TO client;
 
-GRANT USAGE, SELECT ON pending_shipments_id_seq TO client;
+--GRANT USAGE, SELECT ON pending_shipments_id_seq TO client;
 
 -- 1. Roles table
 CREATE TABLE roles (
