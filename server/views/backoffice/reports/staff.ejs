@@ -1,0 +1,66 @@
+<form method="get" class="row g-3 mb-4">
+  <div class="col-md-2">
+    <label class="form-label">First Name</label>
+    <input type="text" name="first_name" class="form-control" value="<%= filters.first_name || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Last Name</label>
+    <input type="text" name="last_name" class="form-control" value="<%= filters.last_name || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Position</label>
+    <select name="position" class="form-select">
+      <option value="">-- Any --</option>
+      <option value="courier" <%= filters.position === 'courier' ? 'selected' : '' %>>Courier</option>
+      <option value="office" <%= filters.position === 'office' ? 'selected' : '' %>>Office</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Office ID</label>
+    <input type="number" name="office_id" class="form-control" value="<%= filters.office_id || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Active</label>
+    <select name="active" class="form-select">
+      <option value="">-- Any --</option>
+      <option value="true" <%= filters.active === 'true' ? 'selected' : '' %>>Yes</option>
+      <option value="false" <%= filters.active === 'false' ? 'selected' : '' %>>No</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Created After</label>
+    <input type="date" name="created_after" class="form-control" value="<%= filters.created_after || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Created Before</label>
+    <input type="date" name="created_before" class="form-control" value="<%= filters.created_before || '' %>">
+  </div>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Apply Filters</button>
+  </div>
+</form>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Position</th>
+      <th>Office ID</th>
+      <th>Created At</th>
+      <th>Active</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% staff.forEach(member => { %>
+      <tr>
+        <td><%= member.id %></td>
+        <td><%= member.first_name %> <%= member.last_name %></td>
+        <td><%= member.position %></td>
+        <td><%= member.office_id %></td>
+        <td><%= new Date(member.created_at).toLocaleDateString() %></td>
+        <td><%= member.active ? 'Yes' : 'No' %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

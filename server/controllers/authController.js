@@ -96,6 +96,7 @@ exports.login = async (req, res) => {
 		req.session.user = {};
     req.session.user.name = username;
 		req.session.user.role = 'client';
+    res.locals.user = req.session.user;
 
 		res.redirect('/');
   } catch (err) {

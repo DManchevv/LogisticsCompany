@@ -2,7 +2,12 @@
 const { staff_pool } = require('../dbUtils');
 
 async function getAllStaff() {
-  const res = await staff_pool.query('SELECT * FROM staff ORDER BY id');
+  const res = await staff_pool.query(`
+		SELECT s.*, o.name AS office_name
+		FROM staff s
+		LEFT JOIN offices o ON s.office_id = o.id
+		ORDER BY s.id DESC
+	`);
   return res.rows;
 }
 

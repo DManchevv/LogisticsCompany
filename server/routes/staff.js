@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const staffModel = require('../models/staff');
+const officesModel = require('../models/office');
 const { body, validationResult } = require('express-validator');
 
 // GET /bo/staff - List all staff
@@ -21,14 +22,21 @@ router.get('/', async (req, res) => {
 });
 
 // GET /bo/staff/add - Show add staff form
-router.get('/add', (req, res) => {
-  res.render('backoffice/staff/add.ejs', {
-    layout: 'backoffice/layout.ejs',
-    title: 'Add Staff Member',
-    active: 'staff',
-    errors: null,
-    formData: {}
-  });
+router.get('/add', async (req, res) => {
+  try {
+    const offices = await officesModel.getAllOffices();
+    res.render('backoffice/staff/add.ejs', {
+      layout: 'backoffice/layout.ejs',
+      title: 'Add Staff Member',
+      active: 'staff',
+      errors: null,
+      formData: {},
+      offices
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
 });
 
 // POST /bo/staff/add - Handle add staff form submission
@@ -78,13 +86,17 @@ router.get('/edit/:id', async (req, res) => {
     if (!staff) {
       return res.status(404).send('Staff not found');
     }
+
+    const offices = await officesModel.getAllOffices();
     res.render('backoffice/staff/edit.ejs', {
       layout: 'backoffice/layout.ejs',
       title: 'Edit Staff Member',
       active: 'staff',
       errors: null,
-      formData: staff
+      formData: staff,
+      offices
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');

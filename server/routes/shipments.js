@@ -1,10 +1,16 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router();  
 const shipmentModel = require('../models/shipment');
 const officeModel = require('../models/office');
 const userModel = require('../models/user');
 const { ensureAuthenticated, ensureClient, ensureBackoffice } = require('../middlewares/auth');
 const { staff_pool } = require('../dbUtils');
+
+// Helper to load shipment statuses
+async function loadShipmentStatuses() {
+  const res = await staff_pool.query('SELECT id, name FROM shipment_statuses ORDER BY name');
+  return res.rows;
+}
 
 // List all shipments
 router.get('/', async (req, res) => {
@@ -18,12 +24,13 @@ router.get('/', async (req, res) => {
   });
 });
 
-
+// Show Add shipment form with statuses
 router.get('/add', async (req, res) => {
   try {
     const users = await userModel.getAllUsers();
     const offices = await officeModel.getAllOffices();
-		const shipments = await shipmentModel.getAllShipments();
+    const shipments = await shipmentModel.getAllShipments();
+    const statuses = await loadShipmentStatuses();
 
     res.render('backoffice/shipments/add.ejs', {
       layout: 'backoffice/layout.ejs',
@@ -32,8 +39,9 @@ router.get('/add', async (req, res) => {
       formData: {},
       errors: [],
       users,
-      offices,
-			shipments
+      offices,  
+      shipments,
+      statuses // new
     });
   } catch (err) {
     console.error(err);
@@ -41,12 +49,12 @@ router.get('/add', async (req, res) => {
   }
 });
 
-// Handle add shipment form POST
+// Handle Add shipment POST
 router.post('/add', async (req, res) => {
   try {
-		if (req.body.status === "registered" && req.body_sender_id != null && req.body_receiver_id != null && req.body_receiver_id === req.body.sender_id) {
-			throw new Error('Sender and receiver cannot be the same user.');
-		}
+    if (req.body.status_id && req.body.sender_id != null && req.body.receiver_id != null && req.body.receiver_id === req.body.sender_id) {
+      throw new Error('Sender and receiver cannot be the same user.');
+    }
 
     await shipmentModel.createShipment(req.body);
     res.redirect('/bo/shipments');
@@ -55,47 +63,67 @@ router.post('/add', async (req, res) => {
 
     const users = await userModel.getAllUsers();
     const offices = await officeModel.getAllOffices();
-		const shipments = await shipmentModel.getAllShipments();
+    const shipments = await shipmentModel.getAllShipments();
+    const statuses = await loadShipmentStatuses();
 
-    // On validation error, re-render with submitted data + errors
     res.render('backoffice/shipments/add.ejs', {
       title: 'Add Shipment',
       active: 'shipments',
       layout: 'backoffice/layout.ejs',
       formData: req.body,
-			users,
-			offices,
-			shipments,
-      errors: err.errors || [],  // or your error format
+      users, 
+      offices,
+      shipments,
+      statuses, // new
+      errors: err.errors || [err.message],  
     });
   }
 });
 
+// Edit shipment form GET
 router.get('/edit/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
     const shipmentRes = await staff_pool.query('SELECT * FROM shipments WHERE id = $1', [id]);
+
     if (shipmentRes.rows.length === 0) {
       req.flash('error', 'Shipment not found.');
       return res.redirect('/bo/shipments');
     }
     const shipment = shipmentRes.rows[0];
-
     const officesRes = await staff_pool.query('SELECT id, name FROM offices ORDER BY name');
-    const usersRes = await staff_pool.query('SELECT id, username FROM users ORDER BY username');
+		const usersRes = await staff_pool.query(`
+			SELECT id, username, first_name, last_name
+			FROM users
+			ORDER BY username
+		`);
 
-    let receiverUser = "asd";
-    if (shipment.status !== 'pending' && shipment.receiver_id) {
-      const receiverRes = await staff_pool.query('SELECT id, username FROM users WHERE id = $1', [shipment.receiver_id]);
+		const users = usersRes.rows.map(u => ({
+			...u,
+			displayName: `${u.username} (${u.first_name} ${u.last_name})`
+		}));
+
+    const statuses = await loadShipmentStatuses();
+
+    let receiverUser = null;
+    if (shipment.status_id && shipment.status_id !== null && shipment.receiver_id) {
+      const receiverRes = await staff_pool.query('SELECT * FROM users WHERE id = $1', [shipment.receiver_id]);
       receiverUser = receiverRes.rows[0];
     }
+
+		if (shipment.receiver_id) {
+			const receiverRes = await staff_pool.query('SELECT username, first_name, last_name FROM users WHERE id = $1', [shipment.receiver_id]);
+			receiverUser = receiverRes.rows[0];
+			receiverUser.displayName = `${receiverUser.username} (${receiverUser.first_name} ${receiverUser.last_name})`;
+		}
 
     res.render('backoffice/shipments/edit.ejs', {
       shipment,
       offices: officesRes.rows,
-      users: usersRes.rows,
+      users,
       receiverUser,
+      statuses,
       errors: null,
       formData: shipment,
       layout: 'backoffice/layout.ejs',
@@ -110,42 +138,59 @@ router.get('/edit/:id', async (req, res) => {
   }
 });
 
+// Handle Edit shipment POST
 router.post('/edit/:id', async (req, res) => {
-	const id = req.params.id;
-	const formData = req.body;
-	const offices = await officeModel.getAllOffices();
-	const users = await userModel.getAllUsers();
+  const id = req.params.id;
+  const formData = req.body;
+  const offices = await officeModel.getAllOffices();
+  const statuses = await loadShipmentStatuses();
 
-	try {
-		if (req.body.status === "registered" && req.body_sender_id != null && req.body_receiver_id != null && req.body_receiver_id === req.body.sender_id) {
-			throw new Error('Sender and receiver cannot be the same user.');
-		}
-
-	  await shipmentModel.updateShipment(id, formData);
-	  res.redirect('/bo/shipments');
-	} catch (err) {
-		let shipment = formData;
-		let receiverUser = null;
-    console.error(err);
-
-    if (shipment.status !== 'pending' && shipment.receiver_id) {
-      const receiverRes = await staff_pool.query('SELECT id, username FROM users WHERE id = $1', [shipment.receiver_id]);
-      receiverUser = receiverRes.rows[0];
+  try {
+    if (req.body.status_id && req.body.sender_id != null && req.body.receiver_id != null && req.body.receiver_id === req.body.sender_id) {
+      throw new Error('Sender and receiver cannot be the same user.');
     }
 
-		return res.render('backoffice/shipments/edit.ejs', {
-			shipment: { id },
-			title: 'Edit Shipment',
-			active: 'shipments',
-			layout: 'backoffice/layout.ejs',
-			offices,
-			receiverUser,
-			users,
-			errors: [err],
-			formData
-		});
-	}
+    await shipmentModel.updateShipment(id, formData);
+    res.redirect('/bo/shipments');
+  } catch (err) {
+    let shipment = formData;
+    let receiverUser = null;
+    console.error(err);
 
+    if (shipment.status_id && shipment.status_id !== null && shipment.receiver_id) {
+      const receiverRes = await staff_pool.query('SELECT * FROM users WHERE id = $1', [shipment.receiver_id]);
+      receiverUser = receiverRes.rows[0];
+    } 
+
+		const usersRes = await staff_pool.query(`
+			SELECT id, username, first_name, last_name
+			FROM users
+			ORDER BY username
+		`);
+		const users = usersRes.rows.map(u => ({
+			...u,
+			displayName: `${u.username} (${u.first_name} ${u.last_name})`
+		}));
+
+		if (shipment.receiver_id) {
+			const receiverRes = await staff_pool.query('SELECT username, first_name, last_name FROM users WHERE id = $1', [shipment.receiver_id]);
+			receiverUser = receiverRes.rows[0];
+			receiverUser.displayName = `${receiverUser.username} (${receiverUser.first_name} ${receiverUser.last_name})`;
+		}
+
+    return res.render('backoffice/shipments/edit.ejs', {
+      shipment: { id },
+      title: 'Edit Shipment',
+      active: 'shipments',  
+      layout: 'backoffice/layout.ejs',
+      offices,
+      receiverUser,   
+      users,
+      statuses, // new
+      errors: [err.message || err],
+      formData
+    });
+  }
 });
 
 // Delete shipment

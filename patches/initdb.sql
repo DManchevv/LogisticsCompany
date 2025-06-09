@@ -42,9 +42,7 @@ CREATE TABLE shipments (
   status TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT receiver_id_required_if_not_pending CHECK (
-    (status = 'pending' AND receiver_id IS NULL)
-    OR
-    (status <> 'pending' AND receiver_id IS NOT NULL)
+    status <> 'pending' AND receiver_id IS NOT NULL
   )
 );
 
@@ -221,3 +219,30 @@ GRANT USAGE,SELECT ON shipments_id_seq TO staff;
 GRANT SELECT,INSERT,UPDATE ON users TO staff;
 GRANT SELECT, INSERT ON shipments TO client;
 GRANT USAGE, SELECT ON shipments_id_seq TO client;
+
+CREATE TABLE shipment_statuses (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE
+);
+
+ALTER TABLE shipments
+  ADD COLUMN status_id INTEGER,
+  DROP COLUMN status,
+  ADD CONSTRAINT fk_shipments_status
+    FOREIGN KEY (status_id) REFERENCES shipment_statuses(id);
+
+INSERT INTO shipment_statuses (name) VALUES
+  ('pending'),
+  ('in_transit'),
+  ('delivered'),
+  ('registered'),
+  ('cancelled');
+
+GRANT SELECT,INSERT,UPDATE,DELETE ON shipment_statuses TO staff;
+GRANT SELECT ON shipment_statuses TO client;
+
+ALTER TABLE shipments
+ADD COLUMN sender_office_id integer,
+ADD COLUMN receiver_office_id integer,
+ADD CONSTRAINT fk_sender_office FOREIGN KEY (sender_office_id) REFERENCES offices(id),
+ADD CONSTRAINT fk_receiver_office FOREIGN KEY (receiver_office_id) REFERENCES offices(id);

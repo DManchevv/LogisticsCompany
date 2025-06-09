@@ -17,7 +17,6 @@ router.get('/send-package', ensureClient, (req, res) => {
   });
 });
 
-// Handle form submission
 router.post(
   '/send-package',
   ensureClient,
@@ -53,7 +52,14 @@ router.post(
 
       const sender_id = senderRes.rows[0].id;
 
-      // Insert into shipments
+      // Get status_id for "pending"
+      const statusRes = await pool.query("SELECT id FROM shipment_statuses WHERE name = 'pending' LIMIT 1");
+      if (statusRes.rowCount === 0) {
+        throw new Error("Shipment status 'pending' not found.");
+      }
+      const pendingStatusId = statusRes.rows[0].id;
+
+      // Insert into shipments using status_id
       await pool.query(`
         INSERT INTO shipments (
           sender_id,
@@ -63,8 +69,8 @@ router.post(
           weight,
           price,
           description,
-          status
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
+          status_id
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       `, [
         sender_id,
         formData.recipient_first_name,
@@ -72,23 +78,24 @@ router.post(
         formData.recipient_address,
         formData.weight,
         formData.package_price,
-        formData.description || null
+        formData.description || null,
+        pendingStatusId
       ]);
 
       req.flash('success', 'Package registered successfully!');
       res.redirect('/clients/pending-shipments');
 
     } catch (err) {
-      console.error('Error inserting shipment:', err);
-      req.flash('error', 'Failed to register package.');
-      res.render('send-package.ejs', {
-        user: req.session.user.name,
-        errors: [{ msg: 'Server error' }],
-        formData,
-        title: 'Register Package'
-      });
-    }
-  }
+			console.error('Error inserting shipment:', err);
+			req.flash('error', 'Failed to register package.');
+			res.render('send-package.ejs', {
+				user: req.session.user.name,
+				errors: [{ msg: 'Server error' }],
+				formData,
+				title: 'Register Package'
+			});
+		}
+	}
 );
 
 // List pending shipments for logged-in client
@@ -107,7 +114,7 @@ router.get('/pending-shipments', ensureClient, async (req, res) => {
     const shipmentsRes = await pool.query(`
       SELECT id, recipient_first_name, recipient_last_name, delivery_address, weight, price, description, created_at
       FROM shipments
-      WHERE sender_id = $1 AND status = 'pending'
+      WHERE sender_id = $1 AND status_id = 1
       ORDER BY created_at DESC
     `, [sender_id]);
 
@@ -123,5 +130,39 @@ router.get('/pending-shipments', ensureClient, async (req, res) => {
   }
 });
 
-module.exports = router;
+router.get('/received-shipments', async (req, res) => {
+  try {
+    const username = req.session.user.name;
 
+    const rows = await pool.query(`
+      SELECT s.id,
+							s.weight,
+							s.price,
+							s.description,
+							s.delivery_address,
+							s.created_at,
+              u.first_name AS recipient_first_name,
+							u.last_name AS recipient_last_name
+       FROM shipments s
+       JOIN users u ON s.sender_id = u.id
+       WHERE u.username = $1
+				 AND s.status_id = 2 OR s.status_id = 3`, [username]);
+
+    res.render('client-received-shipments.ejs', {
+      shipments: rows.rows,
+      currentPage: '/clients/received-shipments',
+      user: req.session.user.name,
+			title: 'Register Shipment'
+    });
+  } catch (err) {
+    console.error(err);
+		res.render('client-received-shipments.ejs', {
+			shipments: [],
+			errors: [{ msg: 'Server error' }],
+			user: req.session.user.name,
+			title: 'Register Shipment'
+		});
+  }
+});
+
+module.exports = router;

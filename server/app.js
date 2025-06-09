@@ -55,7 +55,18 @@ app.use(express.static('./public/'));
 app.set('views', __dirname + '/views')
 app.engine('html', require('ejs').renderFile);
 app.use((req, res, next) => {
-  res.locals.currentPage = req.path.split('/')[1] || 'home';
+  const staticFileRegex = /\.(css|js|ico|png|jpg|jpeg|gif|svg|woff2?|ttf|eot|map)$/i;
+
+  // Only assign currentPage if not a static file
+  if (!staticFileRegex.test(req.path)) {
+    res.locals.currentPage = req.path || '/';
+  }
+	else {
+		res.locals.currentPage = "";
+	}
+
+	console.log(res.locals.currentPage);
+
   next();
 });
 
@@ -79,7 +90,7 @@ app.use('/auth', authRoutes);
 app.use('/clients', clientRoutes);
 app.use('/employees', employeeRoutes);
 app.use('/bo/shipments', shipmentRoutes);
-app.use('/reports', reportRoutes);
+app.use('/bo/reports', reportRoutes);
 app.use('/bo/staff-roles', boStaffRolesRouter);
 app.use('/bo/roles', rolesRouter);
 app.use('/bo/offices', officeRoutes);

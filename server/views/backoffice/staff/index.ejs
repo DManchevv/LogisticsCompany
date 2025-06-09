@@ -22,7 +22,7 @@
           <td><%= member.first_name %></td>
           <td><%= member.last_name %></td>
           <td><%= member.position %></td>
-          <td><%= member.office_id || '-' %></td>
+          <td><%= member.office_name || '-' %></td>
           <td><%= new Date(member.created_at).toLocaleString() %></td>
           <td>
             <a href="/bo/staff/edit/<%= member.id %>" class="btn btn-sm btn-primary me-1">

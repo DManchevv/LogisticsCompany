@@ -1,14 +1,38 @@
 <form action="/bo/shipments/add" method="POST">
   <!-- Sender -->
-  <div class="mb-3">
-    <label for="sender_id" class="form-label">Sender</label>
-    <select class="form-select" id="sender_id" name="sender_id" required>
-      <option value="">Select sender</option>
-      <% users.forEach(u => { %>
-        <option value="<%= u.id %>" <%= formData.sender_id == u.id ? 'selected' : '' %>><%= u.first_name %> <%= u.last_name %></option>
-      <% }) %>
-    </select>
-  </div>
+	<div class="mb-3">
+		<label for="sender_id" class="form-label">Sender</label>
+		<select class="form-select" id="sender_id" name="sender_id" required>
+			<option value="">Select sender</option>
+			<% users.forEach(user => { %>
+				<option value="<%= user.id %>" <%= formData.sender_id == user.id ? 'selected' : '' %>>
+					<%= user.username %> (<%= user.first_name %> <%= user.last_name %>)
+				</option>
+			<% }) %>
+		</select>
+	</div>
+
+	<!-- Sender Office -->
+	<div class="mb-3">
+		<label for="sender_office_id" class="form-label">Sender Office</label>
+		<select class="form-select" id="sender_office_id" name="sender_office_id" required>
+			<option value="">Select sender office</option>
+			<% offices.forEach(o => { %>
+				<option value="<%= o.id %>" <%= formData.sender_office_id == o.id ? 'selected' : '' %>><%= o.name %></option>
+			<% }) %>
+		</select>
+	</div>
+
+	<!-- Receiver Office -->
+	<div class="mb-3">
+		<label for="receiver_office_id" class="form-label">Receiver Office</label>
+		<select class="form-select" id="receiver_office_id" name="receiver_office_id" required>
+			<option value="">Select receiver office</option>
+			<% offices.forEach(o => { %>
+				<option value="<%= o.id %>" <%= formData.receiver_office_id == o.id ? 'selected' : '' %>><%= o.name %></option>
+			<% }) %>
+		</select>
+	</div>
 
   <!-- Delivery Address -->
   <div class="mb-3">
@@ -34,13 +58,16 @@
     <textarea class="form-control" id="description" name="description"><%= formData.description || '' %></textarea>
   </div>
 
-  <div class="mb-3">
-    <label for="status" class="form-label">Status</label>
-    <select class="form-select" id="status" name="status" required>
-      <option value="pending" <%= formData.status === 'pending' ? 'selected' : '' %>>Pending</option>
-      <option value="registered" <%= formData.status === 'registered' ? 'selected' : '' %>>Registered</option>
-    </select>
-  </div>
+	<div class="mb-3">
+		<label for="status_id" class="form-label">Status</label>
+		<select name="status_id" id="status_id" class="form-select" required>
+			<% statuses.forEach(status => { %>
+				<option value="<%= status.id %>" <%= formData.status_id == status.id ? 'selected' : '' %>>
+					<%= status.name.charAt(0).toUpperCase() + status.name.slice(1) %>
+				</option>
+			<% }) %>
+		</select>
+	</div>
 
   <div id="pending-fields">
     <div class="mb-3">
@@ -56,11 +83,13 @@
   <div id="registered-fields" style="display:none;">
     <div class="mb-3">
       <label for="receiver_id" class="form-label">Select Registered Receiver</label>
-      <select class="form-select" name="receiver_id" id="receiver_id">
-	<option value="">-- Select Receiver --</option>
-	<% users.forEach(user => { %>
-	  <option value="<%= user.id %>" <%= formData.receiver_id == user.id ? 'selected' : '' %>><%= user.first_name %> <%= user.last_name %></option>
-	<% }) %>
+      <select name="receiver_id" id="receiver_id" class="form-select">
+        <option value="">Select receiver</option>
+        <% users.forEach(user => { %>
+          <option value="<%= user.id %>" <%= formData.receiver_id == user.id ? 'selected' : '' %>>
+            <%= user.username %> (<%= user.first_name %> <%= user.last_name %>)
+          </option>
+        <% }) %>
       </select>
     </div>
   </div>
@@ -70,12 +99,12 @@
 </form>
 
 <script>
-  const statusSelect = document.getElementById('status');
+  const statusSelect = document.getElementById('status_id');
   const pendingFields = document.getElementById('pending-fields');
   const registeredFields = document.getElementById('registered-fields');
 
   function toggleFields() {
-    if (statusSelect.value === 'pending') {
+    if (statusSelect.value === '1') {
       pendingFields.style.display = 'block';
       registeredFields.style.display = 'none';
     } else {
@@ -89,11 +118,11 @@
 
   const form = document.querySelector('form');
   form.addEventListener('submit', (e) => {
-    const status = document.getElementById('status').value;
+    const status = document.getElementById('status_id').value;
     const senderId = document.getElementById('sender_id')?.value;
     const receiverId = document.getElementById('receiver_id')?.value;
 
-    if (status === 'registered' && senderId && receiverId && senderId === receiverId) {
+    if (status === '4' && senderId && receiverId && senderId === receiverId) {
       e.preventDefault();
       alert('Sender and receiver cannot be the same user.');
     }

@@ -1,3 +1,9 @@
+<style>
+div.container {
+	max-width: 1400px;
+}
+</style>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="/">
@@ -10,22 +16,27 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" href="/">
+                    <a class="nav-link <%= currentPage === '/' ? 'active' : '' %>" href="/">
                         <i class="fas fa-home me-1"></i> Home
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/services">
-                        <i class="fas fa-truck me-1"></i> Services
+                    <a class="nav-link <%= currentPage === '/clients/send-package' ? 'active' : '' %>" href="/clients/send-package">
+                        <i class="fas fa-box me-1"></i> Send Shipment
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/clients/pending-shipments">
+                    <a class="nav-link <%= currentPage === '/received-shipments' ? 'active' : '' %>" href="/clients/received-shipments">
+                        <i class="fas fa-inbox me-1"></i> Received Shipments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === '/clients/pending-shipments' ? 'active' : '' %>" href="/clients/pending-shipments">
                         <i class="fas fa-map-marker-alt me-1"></i> My Pending Shipments
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/about">
+                    <a class="nav-link <%= currentPage === '/about' ? 'active' : '' %>" href="/about">
                         <i class="fas fa-phone me-1"></i> Contact
                     </a>
                 </li>

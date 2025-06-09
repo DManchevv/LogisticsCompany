@@ -1,10 +1,5 @@
 <form action="/bo/shipments/edit/<%= shipment.id %>" method="POST">
   <div class="mb-3">
-    <label for="tracking_number" class="form-label">Tracking Number</label>
-    <input type="text" class="form-control" id="tracking_number" name="tracking_number" value="<%= formData.tracking_number || '' %>" required>
-  </div>
-
-  <div class="mb-3">
     <label for="sender_office_id" class="form-label">Sender Office</label>
     <select class="form-select" id="sender_office_id" name="sender_office_id" required>
       <option value="">Select sender office</option>
@@ -14,42 +9,27 @@
     </select>
   </div>
 
-  <div class="mb-3">
-    <label for="sender_id" class="form-label">Sender</label>
-    <select class="form-select" id="sender_id" name="sender_id" required>
-      <option value="">Select sender</option>
-      <% users.forEach(u => { %>
-        <option value="<%= u.id %>" <%= formData.sender_id == u.id ? 'selected' : '' %>><%= u.username %></option>
-      <% }) %>
-    </select>
-  </div>
+	<div class="mb-3">
+		<label for="receiver_office_id" class="form-label">Receiver Office</label>
+		<select class="form-select" id="receiver_office_id" name="receiver_office_id" required>
+			<option value="">Select receiver office</option>
+			<% offices.forEach(o => { %>
+				<option value="<%= o.id %>" <%= formData.receiver_office_id == o.id ? 'selected' : '' %>><%= o.name %></option>
+			<% }) %>
+		</select>
+	</div>
 
-  <% if (receiverUser) { %>
-    <div class="mb-3">
-      <label for="receiver_id" class="form-label">Receiver</label>
-      <input type="text" class="form-control" id="receiver_id" value="<%= receiverUser.username %>" disabled>
-    </div>
-  <% } else { %>
-    <div class="mb-3">
-      <label for="receiver_id" class="form-label">Receiver</label>
-      <select class="form-select" id="receiver_id" name="receiver_id">
-        <option value="">Select receiver</option>
-        <% users.forEach(u => { %>
-          <option value="<%= u.id %>" <%= formData.receiver_id == u.id ? 'selected' : '' %>><%= u.username %></option>
-        <% }) %>
-      </select>
-    </div>
-  <% } %>
-
-  <div class="mb-3">
-    <label for="recipient_first_name" class="form-label">Recipient First Name</label>
-    <input type="text" class="form-control" id="recipient_first_name" name="recipient_first_name" value="<%= formData.recipient_first_name || '' %>">
-  </div>
-
-  <div class="mb-3">
-    <label for="recipient_last_name" class="form-label">Recipient Last Name</label>
-    <input type="text" class="form-control" id="recipient_last_name" name="recipient_last_name" value="<%= formData.recipient_last_name || '' %>">
-  </div>
+	<div class="mb-3">
+		<label for="sender_id" class="form-label">Sender</label>
+		<select class="form-select" id="sender_id" name="sender_id" required>
+			<option value="">Select sender</option>
+			<% users.forEach(user => { %>
+				<option value="<%= user.id %>" <%= formData.sender_id == user.id ? 'selected' : '' %>>
+					<%= user.displayName %>
+				</option>
+			<% }) %>
+		</select>
+	</div>
 
   <div class="mb-3">
     <label for="delivery_address" class="form-label">Delivery Address</label>
@@ -71,14 +51,97 @@
     <textarea class="form-control" id="description" name="description"><%= formData.description || '' %></textarea>
   </div>
 
-  <div class="mb-3">
-    <label for="status" class="form-label">Status</label>
-    <select class="form-select" id="status" name="status" required>
-      <% ['pending', 'registered', 'shipped', 'delivered', 'cancelled'].forEach(st => { %>
-        <option value="<%= st %>" <%= formData.status === st ? 'selected' : '' %>><%= st.charAt(0).toUpperCase() + st.slice(1) %></option>
-      <% }) %>
-    </select>
-  </div>
+	<div class="mb-3">
+		<label for="status_id" class="form-label">Status</label>
+		<select name="status_id" id="status_id" class="form-select" required>
+			<% statuses.forEach(status => { %>
+				<option value="<%= status.id %>" <%= formData.status_id == status.id ? 'selected' : '' %>>
+					<%= status.name.charAt(0).toUpperCase() + status.name.slice(1) %>
+				</option>
+			<% }) %>
+		</select>
+	</div>
 
-  <button type="submit" class="btn btn-primary">Update Shipment</button>
+	<div id="pending-fields">
+		<div class="mb-3">
+			<label for="recipient_first_name" class="form-label">Receiver First Name</label>
+			<input type="text" class="form-control" id="recipient_first_name" name="recipient_first_name" value="<%= formData.recipient_first_name || '' %>">
+		</div>
+
+		<div class="mb-3">
+			<label for="recipient_last_name" class="form-label">Receiver Last Name</label>
+			<input type="text" class="form-control" id="recipient_last_name" name="recipient_last_name" value="<%= formData.recipient_last_name || '' %>">
+		</div>
+	</div>
+
+	<div id="registered-fields" style="display: none;">
+			<div class="mb-3">
+				<label for="receiver_id" class="form-label">Receiver</label>
+				<select name="receiver_id" id="receiver_id" class="form-select">
+					<option value="">Select receiver</option>
+					<% users.forEach(user => { %>
+						<option value="<%= user.id %>" <%= formData.receiver_id == user.id ? 'selected' : '' %>>
+							<%= user.username %> (<%= user.first_name %> <%= user.last_name %>)
+						</option>
+					<% }) %>
+				</select>
+			</div>
+	</div>
+
+	<!-- Submit button -->
+	<button type="submit" class="btn btn-primary">Update Shipment</button>
 </form>
+
+<script>
+  const statusSelect = document.getElementById('status_id');
+  const pendingFields = document.getElementById('pending-fields');
+  const registeredFields = document.getElementById('registered-fields');
+
+  function toggleFields() {
+    if (statusSelect.value === '1') { // Pending
+      pendingFields.style.display = 'block';
+      registeredFields.style.display = 'none';
+    } else {
+      pendingFields.style.display = 'none';
+      registeredFields.style.display = 'block';
+    }
+  }
+
+  statusSelect.addEventListener('change', toggleFields);
+  window.addEventListener('DOMContentLoaded', toggleFields);
+
+  const form = document.querySelector('form');
+  form.addEventListener('submit', (e) => {
+    const status = document.getElementById('status_id').value;
+    const senderId = document.getElementById('sender_id')?.value;
+    const receiverId = document.getElementById('receiver_id')?.value;
+    const firstName = document.getElementById('recipient_first_name')?.value.trim();
+    const lastName = document.getElementById('recipient_last_name')?.value.trim();
+
+    if (status === '1') { // Pending
+      if (!firstName || !lastName) {
+        e.preventDefault();
+        alert('Please enter recipient first and last name.');
+        return;
+      }
+
+			document.getElementById('receiver_id').value="";
+    } else if (status === '4') { // Registered
+      if (!receiverId) {
+        e.preventDefault();
+        alert('Please select a registered receiver.');
+        return;
+      }
+
+			document.getElementById('recipient_first_name').value="";
+			document.getElementById('recipient_last_name').value="";
+    }
+
+		if (status != '1' && senderId && senderId === receiverId) {
+			e.preventDefault();
+			alert('Sender and receiver cannot be the same user.');
+			return;
+		}
+
+  });
+</script>

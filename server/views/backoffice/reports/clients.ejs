@@ -1,0 +1,62 @@
+<form method="get" class="row g-3 mb-4">
+  <div class="col-md-2">
+    <label class="form-label">Username</label>
+    <input type="text" name="username" class="form-control" value="<%= filters.username || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">First Name</label>
+    <input type="text" name="first_name" class="form-control" value="<%= filters.first_name || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Last Name</label>
+    <input type="text" name="last_name" class="form-control" value="<%= filters.last_name || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Email Contains</label>
+    <input type="text" name="email" class="form-control" value="<%= filters.email || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Active</label>
+    <select name="active" class="form-select">
+      <option value="">-- Any --</option>
+      <option value="true" <%= filters.active === 'true' ? 'selected' : '' %>>Yes</option>
+      <option value="false" <%= filters.active === 'false' ? 'selected' : '' %>>No</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Created After</label>
+    <input type="date" name="created_after" class="form-control" value="<%= filters.created_after || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Created Before</label>
+    <input type="date" name="created_before" class="form-control" value="<%= filters.created_before || '' %>">
+  </div>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Apply Filters</button>
+  </div>
+</form>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Active</th>
+			<th>Created At</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% users.forEach(user => { %>
+      <tr>
+        <td><%= user.username %></td>
+        <td><%= user.first_name %> <%= user.last_name %></td>
+        <td><%= user.email %></td>
+        <td><%= user.phone %></td>
+        <td><%= user.active ? 'Yes' : 'No' %></td>
+				<td><%= new Date(user.created_at).toLocaleDateString() %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

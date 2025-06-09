@@ -1,0 +1,86 @@
+<form method="get" class="row g-3 mb-4">
+  <div class="col-md-2">
+    <label class="form-label">Sender ID</label>
+    <input type="number" name="sender_id" class="form-control" value="<%= filters.sender_id || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Receiver ID</label>
+    <input type="number" name="receiver_id" class="form-control" value="<%= filters.receiver_id || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Recipient First Name</label>
+    <input type="text" name="recipient_first_name" class="form-control" value="<%= filters.recipient_first_name || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Recipient Last Name</label>
+    <input type="text" name="recipient_last_name" class="form-control" value="<%= filters.recipient_last_name || '' %>">
+  </div>
+	<div class="col-md-2">
+		<label class="form-label">Status</label>
+		<select name="status_id" class="form-select">
+			<option value="">-- Any --</option>
+			<% statuses.forEach(s => { %>
+				<option value="<%= s.id %>" <%= filters.status_id == s.id ? 'selected' : '' %>><%= s.name %></option>
+			<% }) %>
+		</select>
+	</div>
+  <div class="col-md-2">
+    <label class="form-label">Weight ≥</label>
+    <input type="number" step="0.01" name="weight_min" class="form-control" value="<%= filters.weight_min || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Weight ≤</label>
+    <input type="number" step="0.01" name="weight_max" class="form-control" value="<%= filters.weight_max || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Price ≥</label>
+    <input type="number" step="0.01" name="price_min" class="form-control" value="<%= filters.price_min || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Price ≤</label>
+    <input type="number" step="0.01" name="price_max" class="form-control" value="<%= filters.price_max || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Created After</label>
+    <input type="date" name="created_after" class="form-control" value="<%= filters.created_after || '' %>">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Created Before</label>
+    <input type="date" name="created_before" class="form-control" value="<%= filters.created_before || '' %>">
+  </div>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Apply Filters</button>
+  </div>
+</form>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Sender ID</th>
+      <th>Receiver ID</th>
+      <th>Recipient Name</th>
+      <th>Address</th>
+      <th>Weight</th>
+      <th>Price</th>
+      <th>Status</th>
+      <th>Created At</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% shipments.forEach(s => { %>
+      <tr>
+        <td><%= s.id %></td>
+        <td><%= s.sender_id %></td>
+        <td><%= s.receiver_id || '-' %></td>
+        <td><%= s.recipient_first_name %> <%= s.recipient_last_name %></td>
+        <td><%= s.delivery_address %></td>
+        <td><%= s.weight %></td>
+        <td><%= s.price %></td>
+				<%=s.status%>
+        <td><%= s.status %></td>
+        <td><%= new Date(s.created_at).toLocaleDateString() %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
