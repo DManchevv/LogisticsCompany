@@ -58,6 +58,8 @@ async function updateShipment(id, data) {
     status,
   } = data;
 
+  console.log("CHECK_RECEIVER_ID:", receiver_id);
+
   const query = `
     UPDATE shipments SET
       receiver_id = $1,

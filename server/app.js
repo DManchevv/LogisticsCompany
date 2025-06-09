@@ -84,6 +84,10 @@ app.use('/bo/staff-roles', boStaffRolesRouter);
 app.use('/bo/roles', rolesRouter);
 app.use('/bo/offices', officeRoutes);
 
+app.get('/bo', (req, res) => {
+  res.redirect('/bo/staff');
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

@@ -3,10 +3,10 @@ const validator = require('validator');
 
 exports.register = async (req, res) => {
   const { firstName, lastName, username, email, password, confirmPassword, phone } = req.body;
-  
+
   // Validation
   const errors = [];
-  
+
   // Required fields
   if (!firstName) errors.push('First name is required');
   if (!lastName) errors.push('Last name is required');
@@ -14,59 +14,52 @@ exports.register = async (req, res) => {
   if (!email) errors.push('Email is required');
   if (!password) errors.push('Password is required');
   if (!confirmPassword) errors.push('Please confirm your password');
-  
+
   // Field formats
   if (email && !validator.isEmail(email)) errors.push('Invalid email format');
-  if (username && !validator.isAlphanumeric(username, 'en-US', {ignore: '_-'})) {
+  if (username && !validator.isAlphanumeric(username, 'en-US', { ignore: '_-' })) {
     errors.push('Username can only contain letters, numbers, underscores and hyphens');
   }
   if (password && password.length < 8) errors.push('Password must be at least 8 characters');
   if (password !== confirmPassword) errors.push('Passwords do not match');
-  
+
   if (errors.length > 0) {
     req.flash('error', errors);
     return res.redirect('/auth/register');
   }
-  
+
   try {
     // Check if username already exists
     const usernameCheck = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
     if (usernameCheck.rows.length > 0) {
       errors.push('Username already in use');
     }
-    
+
     // Check if email already exists
     const emailCheck = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
     if (emailCheck.rows.length > 0) {
       errors.push('Email already in use');
     }
-    
+
     if (errors.length > 0) {
       req.flash('error', errors);
       return res.redirect('/auth/register');
     }
-    
-    // Create new user (password will be hashed by database trigger)
-    const newUser = await pool.query(
+
+    // Create new user
+    await pool.query(
       `INSERT INTO users (first_name, last_name, username, email, password, phone) 
-       VALUES ($1, $2, $3, $4, $5, $6) 
-       RETURNING id, first_name, last_name, email, username`,
+       VALUES ($1, $2, $3, $4, $5, $6)`,
       [firstName, lastName, username, email, password, phone]
     );
-    
-    // Log the user in automatically after registration
-    req.login(newUser.rows[0], (err) => {
-      if (err) {
-        console.error('Login after registration error:', err);
-        req.flash('success_msg', 'Registration successful! Please log in');
-        return res.redirect('/auth/login');
-      }
-      return res.redirect('/');
-    });
-    
+
+    // Flash success message and redirect to login
+    req.flash('success', 'Registration successful! Please log in.');
+    res.redirect('/auth/login');
+
   } catch (err) {
     console.error('Registration error:', err);
-    
+
     let errorMessage = 'Registration failed';
     if (err.code === '23505') { // Unique constraint violation
       if (err.constraint === 'users_username_key') {
@@ -75,7 +68,7 @@ exports.register = async (req, res) => {
         errorMessage = 'Email already in use';
       }
     }
-    
+
     req.flash('error', errorMessage);
     res.redirect('/auth/register');
   }

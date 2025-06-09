@@ -121,11 +121,13 @@ router.post('/edit/:id', async (req, res) => {
 			throw new Error('Sender and receiver cannot be the same user.');
 		}
 
-	  await updateShipment(id, formData);
+	  await shipmentModel.updateShipment(id, formData);
 	  res.redirect('/bo/shipments');
 	} catch (err) {
 		let shipment = formData;
 		let receiverUser = null;
+    console.error(err);
+
     if (shipment.status !== 'pending' && shipment.receiver_id) {
       const receiverRes = await staff_pool.query('SELECT id, username FROM users WHERE id = $1', [shipment.receiver_id]);
       receiverUser = receiverRes.rows[0];
