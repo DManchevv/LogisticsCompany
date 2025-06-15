@@ -149,7 +149,7 @@
 
   <main>
     <div class="header-section">
-      <h1>My Pending Shipments</h1>
+      <h1>My Shipments</h1>
     </div>
 
     <div class="container">
@@ -162,6 +162,7 @@
               <tr>
                 <th class="text-end">ID</th>
                 <th>Recipient Name</th>
+                <th>Status</th>
                 <th>Delivery Address</th>
                 <th class="text-end">Weight (kg)</th>
                 <th class="text-end">Price ($)</th>
@@ -173,7 +174,8 @@
               <% shipments.forEach(shipment => { %>
                 <tr>
                   <td class="text-end"><%= shipment.id %></td>
-                  <td><%= shipment.recipient_first_name %> <%= shipment.recipient_last_name %></td>
+                  <td><%= shipment.receiver_username %> </td>
+                  <td><%= shipment.status %></td>
                   <td><%= shipment.delivery_address %></td>
                   <td class="text-end"><%= shipment.weight %></td>
                   <td class="text-end"><%= shipment.price %></td>

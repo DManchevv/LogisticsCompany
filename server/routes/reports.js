@@ -1,22 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const reportController = require('../controllers/reportController');
 const authMiddleware = require('../middlewares/auth');
 const { staff_pool } = require('../dbUtils');
-
-router.get('/revenue', reportController.getRevenueReport);
-router.get('/pending-shipments', reportController.getPendingShipments);
-router.get('/employee-shipments/:employee_id', reportController.getEmployeeShipments);
-
-router.get('/client-shipments/:client_id/:type', (req, res, next) => {
-  const { type } = req.params;
-  
-  if (type === 'sent' || type === 'received') {
-    return reportController.getClientShipments(req, res, next);
-  }
-  
-  res.status(400).json({ error: 'Invalid shipment type. Must be "sent" or "received".' });
-});
 
 router.get('/clients', async (req, res) => {
   const { username, first_name, last_name, email, active, created_before, created_after } = req.query;

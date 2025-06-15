@@ -444,16 +444,13 @@
             <div class="hero-buttons">
                 <% if (user) { %>
                     <a href="/clients/send-package" class="btn btn-primary">
-                        <i class="fas fa-box me-2"></i> Send a Package
+                        <i class="fas fa-box me-2"></i> Send a Shipment
                     </a>
                 <% } else { %>
                     <a href="/auth/register" class="btn btn-primary">
                         <i class="fas fa-user-plus me-2"></i> Get Started
                     </a>
                 <% } %>
-                <a href="/tracking" class="btn btn-outline-light">
-                    <i class="fas fa-search me-2"></i> Track a Shipment
-                </a>
             </div>
         </div>
     </section>
@@ -516,48 +513,6 @@
                         <p>Affordable rates without compromising on service quality or reliability.</p>
                     </div>
                 </div>
-                
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-route"></i>
-                        </div>
-                        <h3>Real-Time Tracking</h3>
-                        <p>Monitor your shipment's journey from pickup to delivery with live updates.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Tracking Section -->
-    <section class="tracking">
-        <div class="container">
-            <div class="tracking-container">
-                <div class="tracking-content">
-                    <h2>Track Your Shipment</h2>
-                    <p>Enter your tracking number to get real-time updates on your package's location and estimated delivery time.</p>
-                    <div class="mt-4">
-                        <a href="/services" class="btn btn-outline-light">
-                            <i class="fas fa-info-circle me-2"></i> Learn More About Services
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="tracking-form">
-                    <h3>Track Package</h3>
-                    <form>
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Enter Tracking Number" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">
-                            <i class="fas fa-search me-2"></i> Track Now
-                        </button>
-                    </form>
-                    <div class="mt-3 text-center">
-                        <a href="/help" class="text-muted">Need help finding your tracking number?</a>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -579,7 +534,7 @@
                         <div class="service-content">
                             <h3>Domestic Shipping</h3>
                             <p>Fast and reliable delivery services within the country with next-day options available.</p>
-                            <a href="/services/domestic">
+                            <a href="">
                                 Learn More <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -594,7 +549,7 @@
                         <div class="service-content">
                             <h3>International Shipping</h3>
                             <p>Global delivery solutions with customs clearance and package consolidation.</p>
-                            <a href="/services/international">
+                            <a href="">
                                 Learn More <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -609,7 +564,7 @@
                         <div class="service-content">
                             <h3>Freight Services</h3>
                             <p>Heavy cargo and pallet shipments with specialized handling and transportation.</p>
-                            <a href="/services/freight">
+                            <a href="">
                                 Learn More <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>

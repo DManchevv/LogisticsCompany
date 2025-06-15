@@ -1,4 +1,4 @@
-<a href="/bo/staff/add" class="btn btn-success mt-3 mb-3">
+<a href="/bo/users/add" class="btn btn-success mt-3 mb-3">
   <i class="fas fa-plus"></i> Add New Staff
 </a>
 
@@ -6,33 +6,39 @@
   <thead class="table-primary">
     <tr>
       <th>ID</th>
+      <th>Username</th>
       <th>First Name</th>
       <th>Last Name</th>
-      <th>Position</th>
-      <th>Office ID</th>
+      <th>Email</th>
+      <th>Address</th>
+      <th>Phone</th>
+      <th>Active</th>
       <th>Created At</th>
       <th>Actions</th>
     </tr>
   </thead>
   <tbody>
-    <% if (staff.length === 0) { %>
+    <% if (user.length === 0) { %>
       <tr>
-        <td colspan="7" class="text-center">No staff members found.</td>
+        <td colspan="7" class="text-center">No users found.</td>
       </tr> 
     <% } else { %>
-      <% staff.forEach(member => { %>
+      <% user.forEach(member => { %>
         <tr>
           <td><%= member.id %></td>
+          <td><%= member.username %></td>
           <td><%= member.first_name %></td>
           <td><%= member.last_name %></td>
-          <td><%= member.position %></td>
-          <td><%= member.office_name || '-' %></td>
+          <td><%= member.email %></td>
+          <td><%= member.address %></td>
+          <td><%= member.phone %></td>
+          <td><%= member.active %></td>
           <td><%= new Date(member.created_at).toLocaleString() %></td>
           <td>
-            <a href="/bo/staff/edit/<%= member.id %>" class="btn btn-sm btn-primary me-1">
+            <a href="/bo/users/edit/<%= member.id %>" class="btn btn-sm btn-primary me-1">
               <i class="fas fa-edit"></i> Edit
             </a>
-            <form method="POST" action="/bo/staff/delete/<%= member.id %>" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this staff member?');">
+            <form method="POST" action="/bo/users/delete/<%= member.id %>" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?');">
               <button type="submit" class="btn btn-sm btn-danger">
                 <i class="fas fa-trash"></i> Delete
               </button>

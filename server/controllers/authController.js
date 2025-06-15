@@ -2,7 +2,7 @@ const pool = require('../config/db');
 const validator = require('validator');
 
 exports.register = async (req, res) => {
-  const { firstName, lastName, username, email, password, confirmPassword, phone } = req.body;
+  const { firstName, lastName, username, email, password, confirmPassword, phone, address } = req.body;
 
   // Validation
   const errors = [];
@@ -14,6 +14,7 @@ exports.register = async (req, res) => {
   if (!email) errors.push('Email is required');
   if (!password) errors.push('Password is required');
   if (!confirmPassword) errors.push('Please confirm your password');
+  if (!address) errors.push('Please confirm your address');
 
   // Field formats
   if (email && !validator.isEmail(email)) errors.push('Invalid email format');
@@ -48,9 +49,9 @@ exports.register = async (req, res) => {
 
     // Create new user
     await pool.query(
-      `INSERT INTO users (first_name, last_name, username, email, password, phone) 
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [firstName, lastName, username, email, password, phone]
+      `INSERT INTO users (first_name, last_name, username, email, password, phone, address) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [firstName, lastName, username, email, password, phone, address]
     );
 
     // Flash success message and redirect to login

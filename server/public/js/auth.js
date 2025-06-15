@@ -11,10 +11,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // For register page
-  const registerToggle = document.querySelector('#register-page #togglePassword');
+  const registerToggle = document.querySelector('#togglePassword');
   if (registerToggle) {
     registerToggle.addEventListener('click', function() {
-      const passwordInput = document.querySelector('#register-page #password');
+      const passwordInput = document.querySelector('#password');
       const icon = this.querySelector('i');
       togglePasswordVisibility(passwordInput, icon);
     });

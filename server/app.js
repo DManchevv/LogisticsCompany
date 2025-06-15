@@ -73,27 +73,24 @@ app.use((req, res, next) => {
 // Routes
 const authRoutes = require('./routes/auth');
 const clientRoutes = require('./routes/clients');
-const employeeRoutes = require('./routes/employees');
-const officeRoutes = require('./routes/offices');
+const officeRouter = require('./routes/offices');
 const shipmentRoutes = require('./routes/shipments');
 const reportRoutes = require('./routes/reports');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
-const adminRouter = require('./routes/admin');
 const rolesRouter = require('./routes/roles');
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/bo/staff', staffRouter);
-app.use('/admin', adminRouter);
 app.use('/auth', authRoutes);
 app.use('/clients', clientRoutes);
-app.use('/employees', employeeRoutes);
 app.use('/bo/shipments', shipmentRoutes);
 app.use('/bo/reports', reportRoutes);
 app.use('/bo/staff-roles', boStaffRolesRouter);
 app.use('/bo/roles', rolesRouter);
-app.use('/bo/offices', officeRoutes);
+app.use('/bo/offices', officeRouter);
+app.use('/bo/users', usersRouter);
 
 app.get('/bo', (req, res) => {
   res.redirect('/bo/staff');

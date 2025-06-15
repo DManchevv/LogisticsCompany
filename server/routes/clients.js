@@ -112,15 +112,24 @@ router.get('/pending-shipments', ensureClient, async (req, res) => {
     const sender_id = userRes.rows[0].id;
 
     const shipmentsRes = await pool.query(`
-      SELECT id, recipient_first_name, recipient_last_name, delivery_address, weight, price, description, created_at
-      FROM shipments
-      WHERE sender_id = $1 AND status_id = 1
+      SELECT s.*,
+             ss.name AS status,
+      CASE 
+        WHEN s.receiver_id IS NOT NULL THEN ru.username
+        WHEN s.receiver_id IS NULL AND ss.name = 'registered' THEN ralt.username
+        ELSE NULL
+      END AS receiver_username
+      FROM shipments s
+      JOIN shipment_statuses ss ON ss.id = s.status_id
+  	  LEFT JOIN users ru ON s.receiver_id = ru.id
+	    LEFT JOIN users ralt ON s.receiver_id IS NULL AND ss.name = 'registered' AND ralt.id = s.receiver_id
+      WHERE sender_id = $1
       ORDER BY created_at DESC
     `, [sender_id]);
 
     res.render('client-pending-shipments.ejs', {
       shipments: shipmentsRes.rows,
-      title: 'Pending Shipments'
+      title: 'My Shipments'
     });
 
   } catch (err) {
