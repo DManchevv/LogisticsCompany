@@ -22,6 +22,18 @@
         <p class="auth-subtitle"><%= subtitle %></p>
       </div>
 
+      <% if (success && success.length) { %>
+        <% success.forEach(msg => { %>
+          <div class="alert alert-success"><%= msg %></div>
+        <% }) %>
+      <% } %>
+
+      <% if (errors && errors.length) { %>
+        <% errors.forEach(msg => { %>
+          <div class="alert alert-danger"><%= msg %></div>
+        <% }) %>
+      <% } %>
+
       <!-- Inject child body here -->
       <%- body %>
     </div>

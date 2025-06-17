@@ -1,65 +1,44 @@
-<!-- views/backoffice/staff/edit.ejs -->
-
-<h1>Edit Staff Member</h1>
-
-<% if (errors && errors.length > 0) { %>
-  <div class="alert alert-danger">
-    <ul class="mb-0">
-      <% errors.forEach(error => { %>
-        <li><%= error.msg %></li>
-      <% }) %>
-    </ul>
+<form action="/bo/users/edit/<%= formData.id %>" method="POST" novalidate>
+  <div class="mb-3">
+    <label for="username" class="form-label">Username *</label>
+    <input type="text" id="username" name="username" class="form-control" value="<%= formData.username || '' %>" required>
   </div>
-<% } %>
 
-<form action="/bo/staff/edit/<%= formData.id %>" method="POST" novalidate>
   <div class="mb-3">
     <label for="first_name" class="form-label">First Name *</label>
-    <input
-      type="text"
-      id="first_name"
-      name="first_name"
-      class="form-control"
-      value="<%= formData.first_name || '' %>"
-      required
-    >
+    <input type="text" id="first_name" name="first_name" class="form-control" value="<%= formData.first_name || '' %>" required>
   </div>
 
   <div class="mb-3">
     <label for="last_name" class="form-label">Last Name *</label>
-    <input
-      type="text"
-      id="last_name"
-      name="last_name"
-      class="form-control"
-      value="<%= formData.last_name || '' %>"
-      required
-    >
+    <input type="text" id="last_name" name="last_name" class="form-control" value="<%= formData.last_name || '' %>" required>
   </div>
 
   <div class="mb-3">
-    <label for="position" class="form-label">Position *</label>
-    <select id="position" name="position" class="form-select" required>
-      <option value="" disabled <%= !formData.position ? 'selected' : '' %>>Select position</option>
-      <option value="courier" <%= formData.position === 'courier' ? 'selected' : '' %>>Courier</option>
-      <option value="office" <%= formData.position === 'office' ? 'selected' : '' %>>Office</option>
-    </select>
+    <label for="email" class="form-label">Email *</label>
+    <input type="email" id="email" name="email" class="form-control" value="<%= formData.email || '' %>" required>
   </div>
 
   <div class="mb-3">
-    <label for="office_id" class="form-label">Office</label>
-    <select id="office_id" name="office_id" class="form-select" required>
-      <option value="">Select office</option>
-      <% offices.forEach(office => { %>
-        <option value="<%= office.id %>" <%= formData.office_id == office.id ? 'selected' : '' %>>
-    <%= office.name %>
-        </option>
-      <% }) %>
+    <label for="phone" class="form-label">Phone</label>
+    <input type="text" id="phone" name="phone" class="form-control" value="<%= formData.phone || '' %>">
+  </div>
+
+  <div class="mb-3">
+    <label for="address" class="form-label">Address</label>
+    <input type="text" id="address" name="address" class="form-control" value="<%= formData.address || '' %>">
+  </div>
+
+  <div class="mb-3">
+    <label for="active" class="form-label">Active</label>
+    <select id="active" name="active" class="form-select">
+      <option value="true" <%= formData.active === true || formData.active === 'true' ? 'selected' : '' %>>Yes</option>
+      <option value="false" <%= formData.active === false || formData.active === 'false' ? 'selected' : '' %>>No</option>
     </select>
   </div>
 
   <button type="submit" class="btn btn-primary">
     <i class="fas fa-save"></i> Save Changes
   </button>
-  <a href="/bo/staff" class="btn btn-secondary ms-2">Cancel</a>
+  <a href="/bo/users" class="btn btn-secondary ms-2">Cancel</a>
 </form>

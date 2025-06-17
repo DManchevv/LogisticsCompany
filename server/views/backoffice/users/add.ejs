@@ -1,97 +1,50 @@
-<!-- views/backoffice/users/add.ejs -->
-
-<% if (errors && errors.length > 0) { %>
-  <div class="alert alert-danger"> 
-    <ul class="mb-0">
-      <% errors.forEach(error => { %>
-        <li><%= error.msg %></li>
-      <% }) %>
-    </ul>
-  </div>
-<% } %>
-
 <form action="/bo/users/add" method="POST" novalidate>
   <div class="mb-3">
     <label for="username" class="form-label">Username *</label>
-    <input
-      type="text"
-      id="username"
-      name="username"
-      class="form-control"
-      value="<%= formData.username || '' %>"
-      required
-    >
+    <input type="text" id="username" name="username" class="form-control" value="<%= formData.username || '' %>" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="password" class="form-label">Password *</label>
+    <input type="password" id="password" name="password" class="form-control" required>
   </div>
 
   <div class="mb-3">
     <label for="first_name" class="form-label">First Name *</label>
-    <input
-      type="text"
-      id="first_name"
-      name="first_name"
-      class="form-control"
-      value="<%= formData.first_name || '' %>"
-      required
-    >
+    <input type="text" id="first_name" name="first_name" class="form-control" value="<%= formData.first_name || '' %>" required>
   </div>
 
   <div class="mb-3">
     <label for="last_name" class="form-label">Last Name *</label>
-    <input
-      type="text"
-      id="last_name"
-      name="last_name"
-      class="form-control"
-      value="<%= formData.last_name || '' %>"
-      required
-    >
+    <input type="text" id="last_name" name="last_name" class="form-control" value="<%= formData.last_name || '' %>" required>
   </div>
 
   <div class="mb-3">
     <label for="email" class="form-label">Email *</label>
-    <input
-      type="email"
-      id="email"
-      name="email"
-      class="form-control"
-      value="<%= formData.email || '' %>"
-      required
-    >
+    <input type="email" id="email" name="email" class="form-control" value="<%= formData.email || '' %>" required>
   </div>
 
   <div class="mb-3">
     <label for="phone" class="form-label">Phone</label>
-    <input
-      type="text"
-      id="phone"
-      name="phone"
-      class="form-control"
-      value="<%= formData.phone || '' %>"
-    >
+    <input type="text" id="phone" name="phone" class="form-control" value="<%= formData.phone || '' %>">
   </div>
 
   <div class="mb-3">
     <label for="address" class="form-label">Address</label>
-    <input
-      type="text"
-      id="address"
-      name="address"
-      class="form-control"
-      value="<%= formData.address || '' %>"
-    >
+    <input type="text" id="address" name="address" class="form-control" value="<%= formData.address || '' %>">
   </div>
 
   <div class="mb-3">
     <label for="active" class="form-label">Active</label>
-    <select id="active" name="active" class="form-select" required>
+    <select id="active" name="active" class="form-select">
       <option value="true" <%= formData.active === 'true' || formData.active === true ? 'selected' : '' %>>Yes</option>
       <option value="false" <%= formData.active === 'false' || formData.active === false ? 'selected' : '' %>>No</option>
     </select>
   </div>
 
   <button type="submit" class="btn btn-primary">
-    <i class="fas fa-plus"></i> Add Staff Member
+    <i class="fas fa-plus"></i> Add User
   </button>
-  <a href="/bo/staff" class="btn btn-secondary ms-2">Cancel</a>
+  <a href="/bo/users" class="btn btn-secondary ms-2">Cancel</a>
 </form>
 

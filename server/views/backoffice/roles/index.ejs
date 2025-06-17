@@ -3,7 +3,7 @@
 </a>
 
 <table class="table table-bordered table-striped">
-  <thead class="table-primary">
+  <thead class="table-primary"> 
     <tr>
       <th>ID</th>
       <th>Name</th>
@@ -20,7 +20,7 @@
           <td><%= role.id %></td>
           <td><%= role.name %></td>
           <td><%= role.permissions.join(', ') || '-' %></td>
-          <td>
+          <td class="d-flex gap-2">
             <a href="/bo/roles/edit/<%= role.id %>" class="btn btn-sm btn-primary">
               <i class="fas fa-edit"></i> Edit
             </a>

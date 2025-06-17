@@ -80,11 +80,28 @@
 						<i class="fas fa-circle me-2"></i> Shipments
 					</a>
 				</li>
+				<li class="nav-item">
+					<a class="nav-link <%= currentPage === '/bo/reports/profit' ? 'active' : '' %>" href="/bo/reports/profit">
+						<i class="fas fa-circle me-2"></i> Profit
+					</a>
+				</li>
 			</ul>
 		</div>
   </nav>
 
   <main class="content">
+    <% if (success && success.length) { %>
+      <% success.forEach(msg => { %>
+        <div class="alert alert-success"><%= msg %></div>
+      <% }) %>
+    <% } %>
+
+    <% if (errors && errors.length) { %>
+      <% errors.forEach(msg => { %>
+        <div class="alert alert-danger"><%= msg %></div>
+      <% }) %>
+    <% } %>
+
     <h1><%= title %></h1>
     <%- body %>
   </main>

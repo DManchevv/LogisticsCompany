@@ -43,10 +43,15 @@ async function getAllRoles() {
   return result.rows;
 }
 
+async function deleteRole(id) {
+  await staff_pool.query('DELETE FROM roles WHERE id = $1', [id]);
+}
+
 module.exports = {
   getAllRoles,
 	getAllWithPermissions,
 	getByIdWithPermissions,
 	create,
-	updatePermissions
+	updatePermissions,
+  deleteRole
 };

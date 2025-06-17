@@ -246,3 +246,9 @@ ADD COLUMN sender_office_id integer,
 ADD COLUMN receiver_office_id integer,
 ADD CONSTRAINT fk_sender_office FOREIGN KEY (sender_office_id) REFERENCES offices(id),
 ADD CONSTRAINT fk_receiver_office FOREIGN KEY (receiver_office_id) REFERENCES offices(id);
+
+ALTER TABLE offices
+ADD CONSTRAINT unique_office_name UNIQUE (name);
+
+GRANT USAGE ON users_id_seq TO staff;
+

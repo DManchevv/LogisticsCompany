@@ -6,6 +6,7 @@ async function getAllStaff() {
 		SELECT s.*, o.name AS office_name
 		FROM staff s
 		LEFT JOIN offices o ON s.office_id = o.id
+    WHERE s.active = true
 		ORDER BY s.id DESC
 	`);
   return res.rows;

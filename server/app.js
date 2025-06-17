@@ -51,6 +51,12 @@ app.use((req, res, next) => {
 // Flash middleware for storing temporary messages (e.g., errors, success notices)
 app.use(flash());
 
+app.use((req, res, next) => {
+  res.locals.errors = req.flash('error');
+  res.locals.success = req.flash('success');
+  next();
+});
+
 // Set up EJS as the view engine (render .html files using EJS)
 app.set('view engine', 'html');
 app.engine('html', require('ejs').renderFile);

@@ -1,122 +1,149 @@
 const express = require('express');
-const router = express.Router();  
+const router = express.Router();
+
 const shipmentModel = require('../models/shipment');
 const officeModel = require('../models/office');
 const userModel = require('../models/user');
-const { ensureAuthenticated, ensureClient, ensureBackoffice } = require('../middlewares/auth');
 const { staff_pool } = require('../dbUtils');
 
-// Helper to load shipment statuses
+/**
+ * Helper function to load all shipment statuses from DB.
+ * @returns {Promise<Array>} Array of shipment statuses.
+ */
 async function loadShipmentStatuses() {
   const res = await staff_pool.query('SELECT id, name FROM shipment_statuses ORDER BY name');
   return res.rows;
 }
 
-// List all shipments
+// ============================================================================
+//  GET /bo/shipments
+//  List all shipments with management UI.
+// ============================================================================
+
 router.get('/', async (req, res) => {
-  const shipments = await shipmentModel.getAllShipments();
-  res.render('backoffice/shipments/index.ejs', {
-    title: 'Shipments Management',
-    active: 'shipments',
-    shipments,
-    errors: null,
-    layout: 'backoffice/layout.ejs',
-  });
+  try {
+    const shipments = await shipmentModel.getAllShipments();
+
+    res.render('backoffice/shipments/index.ejs', {
+      title: 'Shipments Management',
+      active: 'shipments',
+      shipments,
+      errors: req.flash('errors'),
+      success: req.flash('success'),
+      layout: 'backoffice/layout.ejs',
+    });
+  } catch (err) {
+    console.error('Failed to fetch shipments:', err);
+    req.flash('errors', 'Unable to load shipments list. Please try again later.');
+    res.redirect('/bo');
+  }
 });
 
-// Show Add shipment form with statuses
+// ============================================================================
+// GET /bo/shipments/add
+// Render form to add a new shipment, loading all required reference data.
+// ============================================================================
+
 router.get('/add', async (req, res) => {
   try {
-    const users = await userModel.getAllUsers();
-    const offices = await officeModel.getAllOffices();
-    const shipments = await shipmentModel.getAllShipments();
-    const statuses = await loadShipmentStatuses();
+    const [users, offices, shipments, statuses] = await Promise.all([
+      userModel.getAllUsers(),
+      officeModel.getAllOffices(),
+      shipmentModel.getAllShipments(),
+      loadShipmentStatuses()
+    ]);
 
+    // Render form with any flashed errors or form data (if redirected after validation failure)
     res.render('backoffice/shipments/add.ejs', {
       layout: 'backoffice/layout.ejs',
       active: 'shipments',
       title: 'Add Shipment',
-      formData: {},
-      errors: [],
+      formData: req.flash('formData')[0] || {},
+      success: req.flash('success'),
+      errors: req.flash('errors'),
       users,
-      offices,  
+      offices,
       shipments,
-      statuses // new
+      statuses
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
+    console.error('Failed to load add shipment form:', err);
+    req.flash('errors', 'Unable to load the Add Shipment page. Please try again later.');
+    res.redirect('/bo/shipments');
   }
 });
 
-// Handle Add shipment POST
+// ============================================================================
+// POST /bo/shipments/add
+// Handle adding a new shipment. Validates inputs and shows errors via flash.
+// ============================================================================
 router.post('/add', async (req, res) => {
   try {
-    if (req.body.status_id && req.body.sender_id != null && req.body.receiver_id != null && req.body.receiver_id === req.body.sender_id) {
+    const { status_id, sender_id, receiver_id } = req.body;
+
+    // Business validation: sender and receiver cannot be the same user
+    if (sender_id && receiver_id && sender_id === receiver_id) {
       throw new Error('Sender and receiver cannot be the same user.');
     }
 
+    // Create shipment in DB
     await shipmentModel.createShipment(req.body);
+
+    req.flash('success', 'Shipment created successfully.');
     res.redirect('/bo/shipments');
   } catch (err) {
-    console.error(err);
+    console.error('Error creating shipment:', err);
 
-    const users = await userModel.getAllUsers();
-    const offices = await officeModel.getAllOffices();
-    const shipments = await shipmentModel.getAllShipments();
-    const statuses = await loadShipmentStatuses();
+    // Save form data and error messages in flash for rendering after redirect
+    req.flash('errors', [err.message || 'Failed to create shipment. Please check your input.']);
+    req.flash('formData', req.body);
 
-    res.render('backoffice/shipments/add.ejs', {
-      title: 'Add Shipment',
-      active: 'shipments',
-      layout: 'backoffice/layout.ejs',
-      formData: req.body,
-      users, 
-      offices,
-      shipments,
-      statuses, // new
-      errors: err.errors || [err.message],  
-    });
+    res.redirect('/bo/shipments/add');
   }
 });
 
-// Edit shipment form GET
+// ============================================================================
+//  GET /bo/shipments/edit/:id
+// Render edit form for a specific shipment by ID.
+// ============================================================================
+
 router.get('/edit/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
+    // Fetch shipment from DB
     const shipmentRes = await staff_pool.query('SELECT * FROM shipments WHERE id = $1', [id]);
-
     if (shipmentRes.rows.length === 0) {
-      req.flash('error', 'Shipment not found.');
+      req.flash('errors', 'Shipment not found.');
       return res.redirect('/bo/shipments');
     }
     const shipment = shipmentRes.rows[0];
-    const officesRes = await staff_pool.query('SELECT id, name FROM offices ORDER BY name');
-		const usersRes = await staff_pool.query(`
-			SELECT id, username, first_name, last_name
-			FROM users
-			ORDER BY username
-		`);
 
-		const users = usersRes.rows.map(u => ({
-			...u,
-			displayName: `${u.username} (${u.first_name} ${u.last_name})`
-		}));
+    // Load offices, users and shipment statuses in parallel
+    const [officesRes, usersRes, statuses] = await Promise.all([
+      staff_pool.query('SELECT id, name FROM offices ORDER BY name'),
+      staff_pool.query('SELECT id, username, first_name, last_name FROM users ORDER BY username'),
+      loadShipmentStatuses()
+    ]);
 
-    const statuses = await loadShipmentStatuses();
+    // Format users with display names
+    const users = usersRes.rows.map(u => ({
+      ...u,
+      displayName: `${u.username} (${u.first_name} ${u.last_name})`
+    }));
 
+    // Determine receiver user display info, if any
     let receiverUser = null;
-    if (shipment.status_id && shipment.status_id !== null && shipment.receiver_id) {
-      const receiverRes = await staff_pool.query('SELECT * FROM users WHERE id = $1', [shipment.receiver_id]);
-      receiverUser = receiverRes.rows[0];
+    if (shipment.receiver_id) {
+      const receiverRes = await staff_pool.query('SELECT username, first_name, last_name FROM users WHERE id = $1', [shipment.receiver_id]);
+      if (receiverRes.rows.length > 0) {
+        const ru = receiverRes.rows[0];
+        receiverUser = { ...ru, displayName: `${ru.username} (${ru.first_name} ${ru.last_name})` };
+      }
     }
 
-		if (shipment.receiver_id) {
-			const receiverRes = await staff_pool.query('SELECT username, first_name, last_name FROM users WHERE id = $1', [shipment.receiver_id]);
-			receiverUser = receiverRes.rows[0];
-			receiverUser.displayName = `${receiverUser.username} (${receiverUser.first_name} ${receiverUser.last_name})`;
-		}
+    // Use flashed formData if present (from failed validation redirect)
+    const formData = req.flash('formData')[0] || shipment;
 
     res.render('backoffice/shipments/edit.ejs', {
       shipment,
@@ -124,84 +151,73 @@ router.get('/edit/:id', async (req, res) => {
       users,
       receiverUser,
       statuses,
-      errors: null,
-      formData: shipment,
+      errors: req.flash('errors'),
+      success: req.flash('success'),
+      formData,
       layout: 'backoffice/layout.ejs',
       title: 'Edit Shipment',
       active: 'shipments'
     });
-
   } catch (err) {
     console.error('Error loading shipment for edit:', err);
-    req.flash('error', 'Failed to load shipment.');
+    req.flash('errors', 'Failed to load shipment details. Please try again.');
     res.redirect('/bo/shipments');
   }
 });
 
-// Handle Edit shipment POST
+// ============================================================================
+// POST /bo/shipments/edit/:id
+// Handle updating a shipment. Validates inputs and shows errors via flash.
+// ============================================================================
+
 router.post('/edit/:id', async (req, res) => {
   const id = req.params.id;
   const formData = req.body;
-  const offices = await officeModel.getAllOffices();
-  const statuses = await loadShipmentStatuses();
 
   try {
-    if (req.body.status_id && req.body.sender_id != null && req.body.receiver_id != null && req.body.receiver_id === req.body.sender_id) {
+    const { status_id, sender_id, receiver_id } = formData;
+
+    // Business validation: sender and receiver cannot be the same user
+    if (sender_id && receiver_id && sender_id === receiver_id) {
       throw new Error('Sender and receiver cannot be the same user.');
     }
 
-    await shipmentModel.updateShipment(id, formData);
+    // Update shipment in DB
+    const updated = await shipmentModel.updateShipment(id, formData);
+    if (!updated) {
+      req.flash('errors', 'Shipment not found or could not be updated.');
+      return res.redirect('/bo/shipments');
+    }
+
+    req.flash('success', 'Shipment updated successfully.');
     res.redirect('/bo/shipments');
   } catch (err) {
-    let shipment = formData;
-    let receiverUser = null;
-    console.error(err);
+    console.error('Failed to update shipment:', err);
 
-    if (shipment.status_id && shipment.status_id !== null && shipment.receiver_id) {
-      const receiverRes = await staff_pool.query('SELECT * FROM users WHERE id = $1', [shipment.receiver_id]);
-      receiverUser = receiverRes.rows[0];
-    } 
+    // Save error message and formData for re-render after redirect
+    req.flash('errors', [err.message || 'Failed to update shipment. Please check your input.']);
+    req.flash('formData', formData);
 
-		const usersRes = await staff_pool.query(`
-			SELECT id, username, first_name, last_name
-			FROM users
-			ORDER BY username
-		`);
-		const users = usersRes.rows.map(u => ({
-			...u,
-			displayName: `${u.username} (${u.first_name} ${u.last_name})`
-		}));
-
-		if (shipment.receiver_id) {
-			const receiverRes = await staff_pool.query('SELECT username, first_name, last_name FROM users WHERE id = $1', [shipment.receiver_id]);
-			receiverUser = receiverRes.rows[0];
-			receiverUser.displayName = `${receiverUser.username} (${receiverUser.first_name} ${receiverUser.last_name})`;
-		}
-
-    return res.render('backoffice/shipments/edit.ejs', {
-      shipment: { id },
-      title: 'Edit Shipment',
-      active: 'shipments',  
-      layout: 'backoffice/layout.ejs',
-      offices,
-      receiverUser,   
-      users,
-      statuses, // new
-      errors: [err.message || err],
-      formData
-    });
+    res.redirect(`/bo/shipments/edit/${id}`);
   }
 });
 
-// Delete shipment
+// ============================================================================
+// POST /bo/shipments/delete/:id
+// Delete a shipment by ID.
+// ============================================================================
+
 router.post('/delete/:id', async (req, res) => {
   try {
     await shipmentModel.deleteShipment(req.params.id);
-    res.redirect('/bo/shipments');
+    req.flash('success', 'Shipment deleted successfully.');
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Error deleting shipment');
+    console.error('Error deleting shipment:', err);
+    req.flash('errors', 'Failed to delete shipment. Please try again later.');
   }
+
+  res.redirect('/bo/shipments');
 });
 
 module.exports = router;
+
